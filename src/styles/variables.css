@@ -1,0 +1,50 @@
+/**
+ * ====================================================================
+ * VARIABLES GLOBALES DE DISEÑO: NEGRO, BLANCO Y DORADO (GOLD & BLACK)
+ * ====================================================================
+ * Paleta corporativa de "LEGENDARIO BARBER SHOP":
+ * Elegancia, lujo y contraste con fondos negros, tipografía blanca
+ * y acentos metálicos en oro / dorado.
+ */
+
+:root {
+  /* Fondos del sistema (Negro profundo y carbón elegante) */
+  --bg-primary: #0a0b0d;        /* Negro azabache base */
+  --bg-surface: #141518;        /* Superficie de tarjetas y paneles */
+  --bg-surface-elevated: #1c1d22; /* Paneles elevados con sutil relieve */
+  --bg-input: #101114;          /* Fondo para campos de entrada */
+  --bg-input-focus: #16171b;    /* Fondo de entrada al tener foco */
+
+  /* Colores de marca: Dorado y Oro Metálico */
+  --accent-gold: #d4af37;       /* Dorado clásico de la marca Legendario */
+  --accent-gold-light: #f3d179; /* Dorado claro para iluminaciones y textos */
+  --accent-gold-dark: #a67c1e;  /* Dorado oscuro para sombras y profundidad */
+  --accent-gold-glow: rgba(212, 175, 55, 0.28);
+  --accent-gradient: linear-gradient(135deg, #f3d179 0%, #d4af37 50%, #a67c1e 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #fae29f 0%, #dfbd4a 50%, #b88d26 100%);
+
+  /* Escala de texto */
+  --text-primary: #ffffff;      /* Blanco puro para alta legibilidad */
+  --text-secondary: #a7abb6;    /* Gris plateado suave para textos secundarios */
+  --text-muted: #646875;        /* Gris tenue para placeholders */
+  --text-gold: #e5c365;         /* Texto dorado de énfasis */
+
+  /* Bordes y divisores finos */
+  --border-subtle: rgba(255, 255, 255, 0.08);     /* Borde discreto */
+  --border-gold: rgba(212, 175, 55, 0.35);         /* Borde dorado de acento */
+  --border-focus: rgba(212, 175, 55, 0.7);         /* Borde activo en inputs */
+
+  /* Sombras y resplandores dorados */
+  --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --shadow-gold-glow: 0 0 25px rgba(212, 175, 55, 0.25);
+  --shadow-gold-btn: 0 4px 18px rgba(212, 175, 55, 0.35);
+
+  /* Radios de curvatura modernos */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+
+  /* Transición fluida */
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}

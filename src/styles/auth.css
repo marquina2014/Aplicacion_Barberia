@@ -1,0 +1,99 @@
+/**
+ * ====================================================================
+ * ESTILOS GLOBALES DE AUTENTICACIÓN (TEMA DORADO & NEGRO)
+ * ====================================================================
+ * Ambientación lujosa con sutil resplandor dorado de fondo.
+ */
+
+/* Envoltorio central para pantallas de acceso y formularios */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+/* Efectos de halo dorado de fondo (Golden Ambient Glow) */
+.auth-ambient-glow {
+  position: absolute;
+  top: -120px;
+  right: -90px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(10, 11, 13, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.auth-ambient-glow-bottom {
+  position: absolute;
+  bottom: -120px;
+  left: -90px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(243, 209, 121, 0.10) 0%, rgba(10, 11, 13, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Tarjeta de autenticación con ancho óptimo */
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  z-index: 2;
+  padding: 2.25rem;
+}
+
+/* Tarjeta extendida para el formulario de barbero */
+.form-barber-card {
+  width: 100%;
+  max-width: 600px;
+  z-index: 2;
+  padding: 2.5rem;
+}
+
+/* Logotipo de la marca Legendario */
+.brand-logo-img {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+}
+
+/* Enlaces con estilo dorado */
+.accent-link {
+  color: var(--accent-gold-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.accent-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Divisor sutil */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+}
