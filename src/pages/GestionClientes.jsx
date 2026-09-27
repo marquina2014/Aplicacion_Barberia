@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Button, Form, InputGroup, Modal } from 'react-bootstrap';
 import MainLayout from '../components/layout/MainLayout';
+import FormInputField from '../components/common/FormInputField';
 
 /**
  * Vista: GestionClientes
@@ -36,14 +37,14 @@ const GestionClientes = () => {
     <MainLayout title="Gestión de Clientes" subtitle="Directorio y fidelidad de clientes">
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <InputGroup style={{ maxWidth: '340px' }}>
-          <InputGroup.Text className="bg-transparent border-subtle text-gold-accent"><i className="bi bi-search"></i></InputGroup.Text>
+          <InputGroup.Text className="text-gold-accent"><i className="bi bi-search"></i></InputGroup.Text>
           <Form.Control
             type="text" className="dark-input" placeholder="Buscar por nombre o teléfono..."
             value={search} onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={() => setShowModal(true)}>
-          <i className="bi bi-person-plus"></i><span>Registrar Cliente</span>
+          <i className="bi bi-person-plus-fill"></i><span>Registrar Cliente</span>
         </Button>
       </div>
 
@@ -66,31 +67,38 @@ const GestionClientes = () => {
         ))}
       </Row>
 
-      {/* Modal para nuevo cliente */}
+      {/* Modal para nuevo cliente: diseño oscuro idéntico a nuevo barbero */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered contentClassName="dark-card">
         <Modal.Header closeButton closeVariant="white" className="border-gold">
-          <Modal.Title className="text-white fw-bold fs-5">Registrar Cliente</Modal.Title>
+          <Modal.Title className="text-white fw-bold fs-5">
+            <i className="bi bi-person-plus text-gold-accent me-2"></i>Registrar Cliente
+          </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSave}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label className="text-secondary-custom small">Nombre Completo</Form.Label>
-              <Form.Control
-                type="text" className="dark-input" placeholder="Ej: Fernando Ruiz"
-                value={newClient.nombres} onChange={(e) => setNewClient({ ...newClient, nombres: e.target.value })} required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="text-secondary-custom small">Teléfono de Contacto</Form.Label>
-              <Form.Control
-                type="tel" className="dark-input" placeholder="+58 412 0000000"
-                value={newClient.telefono} onChange={(e) => setNewClient({ ...newClient, telefono: e.target.value })} required
-              />
-            </Form.Group>
+          <Modal.Body className="p-4">
+            <FormInputField
+              id="c-name"
+              label="Nombre Completo"
+              value={newClient.nombres}
+              onChange={(e) => setNewClient({ ...newClient, nombres: e.target.value })}
+              placeholder="Ej: Fernando Ruiz"
+              icon="bi-person"
+              required
+            />
+            <FormInputField
+              id="c-phone"
+              label="Teléfono de Contacto"
+              type="tel"
+              value={newClient.telefono}
+              onChange={(e) => setNewClient({ ...newClient, telefono: e.target.value })}
+              placeholder="+58 412 0000000"
+              icon="bi-telephone"
+              required
+            />
           </Modal.Body>
           <Modal.Footer className="border-gold">
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-            <Button type="submit" className="btn-primary-gradient">Guardar Cliente</Button>
+            <Button type="submit" className="btn-primary-gradient px-4">Guardar Cliente</Button>
           </Modal.Footer>
         </Form>
       </Modal>

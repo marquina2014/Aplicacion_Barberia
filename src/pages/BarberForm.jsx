@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert, Row, Col, Card, Container } from 'react-bootstrap';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import BrandLogo from '../components/common/BrandLogo';
 import FormInputField from '../components/common/FormInputField';
 import FormSelectField from '../components/common/FormSelectField';
 import BarberPhotoUpload from '../components/barber/BarberPhotoUpload';
@@ -60,7 +59,7 @@ const BarberForm = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       setNotification(isEditMode ? '¡Barbero actualizado!' : '¡Barbero registrado!');
-      setTimeout(() => navigate('/dashboard'), 900);
+      setTimeout(() => navigate('/vendedores'), 900);
     }, 600);
   };
 
@@ -70,8 +69,7 @@ const BarberForm = () => {
       <div className="auth-ambient-glow-bottom" aria-hidden="true"></div>
       <Container className="d-flex justify-content-center">
         <Card className="dark-card form-barber-card">
-          <div className="d-flex justify-content-center mb-3"><BrandLogo size="normal" /></div>
-          <div className="text-center mb-3">
+          <div className="text-center mb-3 pt-2">
             <h4 className="fw-bold text-white mb-1">{isEditMode ? 'Editar Barbero' : 'Nuevo Barbero'}</h4>
             <p className="text-secondary-custom small mb-0">Gestión de profesionales de Legendario</p>
           </div>
@@ -114,7 +112,7 @@ const BarberForm = () => {
               <Button type="submit" className="btn-primary-gradient flex-grow-1" disabled={isSubmitting}>
                 {isSubmitting ? 'Guardando...' : (isEditMode ? 'Guardar Cambios' : 'Registrar Barbero')}
               </Button>
-              <Link to="/dashboard" className="btn btn-dark-secondary d-flex align-items-center">Cancelar</Link>
+              <Link to="/vendedores" className="btn btn-dark-secondary d-flex align-items-center">Cancelar</Link>
             </div>
           </Form>
         </Card>

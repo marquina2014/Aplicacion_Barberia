@@ -47,7 +47,7 @@ const FormInputField = ({
       <InputGroup>
         {/* Icono decorativo inicial si se especifica */}
         {icon && (
-          <InputGroup.Text className="bg-transparent border-subtle text-secondary-custom px-3">
+          <InputGroup.Text className="text-gold-accent px-3">
             <i className={`bi ${icon}`}></i>
           </InputGroup.Text>
         )}
@@ -67,7 +67,7 @@ const FormInputField = ({
         {type === 'password' && (
           <Button
             variant="outline-secondary"
-            className="border-subtle bg-transparent text-secondary-custom px-3"
+            className="text-gold-accent px-3"
             onClick={() => setShowPassword(!showPassword)}
             type="button"
             aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}

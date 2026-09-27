@@ -40,7 +40,7 @@ const FormSelectField = ({
       {/* Grupo con icono y selector personalizado */}
       <InputGroup>
         {icon && (
-          <InputGroup.Text className="bg-transparent border-subtle text-secondary-custom px-3">
+          <InputGroup.Text className="text-gold-accent px-3">
             <i className={`bi ${icon}`}></i>
           </InputGroup.Text>
         )}

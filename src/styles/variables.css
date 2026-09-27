@@ -8,12 +8,12 @@
  */
 
 :root {
-  /* Fondos del sistema (Negro profundo y carbón elegante) */
-  --bg-primary: #0a0b0d;        /* Negro azabache base */
-  --bg-surface: #141518;        /* Superficie de tarjetas y paneles */
-  --bg-surface-elevated: #1c1d22; /* Paneles elevados con sutil relieve */
-  --bg-input: #101114;          /* Fondo para campos de entrada */
-  --bg-input-focus: #16171b;    /* Fondo de entrada al tener foco */
+  /* Fondos del sistema (Negro puro idéntico al logo del león #000000) */
+  --bg-primary: #000000;        /* Negro puro base */
+  --bg-surface: #000000;        /* Superficie de tarjetas y paneles en negro absoluto */
+  --bg-surface-elevated: #080808; /* Paneles sutilmente elevados */
+  --bg-input: #000000;          /* Fondo para campos de entrada */
+  --bg-input-focus: #070707;    /* Fondo de entrada al tener foco */
 
   /* Colores de marca: Dorado y Oro Metálico */
   --accent-gold: #d4af37;       /* Dorado clásico de la marca Legendario */

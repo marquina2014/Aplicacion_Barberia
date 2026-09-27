@@ -8,30 +8,44 @@ import React from 'react';
  * @param {Object} props
  * @param {string} [props.title="LEGENDARIO"] - Título de la barbería
  * @param {string} [props.subtitle="BARBER SHOP"] - Subtítulo descriptivo
- * @param {string} [props.size="normal"] - Tamaño del logo ('normal' | 'large')
+ * @param {string} [props.size="normal"] - Tamaño del logo ('normal' | 'menu' | 'large')
  */
 const BrandLogo = ({ title = 'LEGENDARIO', subtitle = 'BARBER SHOP', size = 'normal' }) => {
-  const isLarge = size === 'large';
+  // Ajustes proporcionales según el tamaño solicitado
+  let imgHeight = '80px';
+  let titleSize = '1.25rem';
+  let subtitleSize = '0.72rem';
+
+  if (size === 'menu') {
+    imgHeight = '105px';    // Logo más grande para el menú lateral
+    titleSize = '1.48rem';   // Letras del título visiblemente más grandes
+    subtitleSize = '0.84rem'; // Subtítulo dorado proporcional
+  } else if (size === 'large') {
+    imgHeight = '135px';
+    titleSize = '1.75rem';
+    subtitleSize = '0.92rem';
+  }
 
   return (
     <div className="d-flex flex-column align-items-center text-center">
-      {/* Imagen del logo oficial Legendario */}
+      {/* Imagen del logo oficial del león Legendario */}
       <img
         src="/assets/legendario-logo.png"
         alt="Legendario Barber Shop"
         className="brand-logo-img mb-2"
         style={{
-          maxHeight: isLarge ? '110px' : '65px',
-          width: 'auto'
+          maxHeight: imgHeight,
+          width: 'auto',
+          objectFit: 'contain'
         }}
       />
 
-      {/* Textos de la marca */}
+      {/* Contenedor tipográfico de la marca */}
       <div>
         <h3
           className="m-0 fw-extrabold text-white tracking-widest text-uppercase"
           style={{
-            fontSize: isLarge ? '1.5rem' : '1.15rem',
+            fontSize: titleSize,
             letterSpacing: '3px'
           }}
         >
@@ -39,9 +53,9 @@ const BrandLogo = ({ title = 'LEGENDARIO', subtitle = 'BARBER SHOP', size = 'nor
         </h3>
         {subtitle && (
           <span
-            className="text-gold-accent fw-bold text-uppercase d-block"
+            className="text-gold-accent fw-bold text-uppercase d-block mt-1"
             style={{
-              fontSize: isLarge ? '0.8rem' : '0.65rem',
+              fontSize: subtitleSize,
               letterSpacing: '4px'
             }}
           >

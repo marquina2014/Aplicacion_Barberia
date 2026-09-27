@@ -1,14 +1,17 @@
-import React from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
+import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
 
 /**
  * Vista: Dashboard
- * Propósito: Panel de inicio con métricas clave y accesos directos.
- * Se eliminó la tarjeta de rendimiento según instrucción (imagen 2).
+ * Propósito: Panel de inicio con botón de acción superior idéntico en tamaño y posición,
+ * métricas clave y accesos directos a las pantallas operativas.
  */
 const Dashboard = () => {
+  const [showModal, setShowModal] = useState(false);
+
   // Tarjetas métricas del día para la barbería
   const metrics = [
     { title: 'Ventas de Hoy', value: '$420.00', icon: 'bi-cash-stack', detail: '14 servicios realizados' },
@@ -19,6 +22,22 @@ const Dashboard = () => {
 
   return (
     <MainLayout title="Panel de Inicio" subtitle="Bienvenido a Legendario Barber Shop">
+      {/* Barra superior con botón de acción en la esquina superior derecha */}
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+          <h5 className="fw-bold text-white mb-0">Resumen Operativo</h5>
+          <small className="text-secondary-custom">Métricas clave en tiempo real de Legendario</small>
+        </div>
+
+        <Button
+          className="btn-primary-gradient d-flex align-items-center gap-2"
+          onClick={() => setShowModal(true)}
+        >
+          <i className="bi bi-plus-circle-fill"></i>
+          <span>Nueva Venta</span>
+        </Button>
+      </div>
+
       {/* 1. Métricas principales en tarjetas oscuras con borde dorado */}
       <Row className="g-3 mb-4">
         {metrics.map((m, idx) => (
@@ -41,11 +60,11 @@ const Dashboard = () => {
       <Row className="g-3">
         <Col xs={12} md={4}>
           <Card className="dark-card p-4 text-center h-100">
-            <i className="bi bi-cash-coin fs-1 text-gold-accent mb-2"></i>
-            <h5 className="fw-bold text-white">Registrar Nueva Venta</h5>
-            <p className="text-secondary-custom small mb-3">Registra cortes, arreglos de barba o productos.</p>
-            <Link to="/ventas/nueva" className="btn btn-primary-gradient mt-auto">
-              Nueva Venta
+            <i className="bi bi-calendar2-day-fill fs-1 text-gold-accent mb-2"></i>
+            <h5 className="fw-bold text-white">Ventas del Día</h5>
+            <p className="text-secondary-custom small mb-3">Métricas de la jornada, filtros y registro de ventas.</p>
+            <Link to="/ventas-dia" className="btn btn-primary-gradient mt-auto">
+              Ver Ventas del Día
             </Link>
           </Card>
         </Col>
@@ -72,6 +91,8 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
+
+      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={() => {}} />
     </MainLayout>
   );
 };

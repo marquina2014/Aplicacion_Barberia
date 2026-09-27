@@ -29,7 +29,7 @@ const GestionVendedores = () => {
       {/* Barra de herramientas: Búsqueda y Botón para agregar */}
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <InputGroup style={{ maxWidth: '340px' }}>
-          <InputGroup.Text className="bg-transparent border-subtle text-gold-accent">
+          <InputGroup.Text className="text-gold-accent">
             <i className="bi bi-search"></i>
           </InputGroup.Text>
           <Form.Control

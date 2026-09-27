@@ -1,86 +1,88 @@
 import React, { useState } from 'react';
-import { Nav, Table, Card } from 'react-bootstrap';
+import { Card, Table, Badge } from 'react-bootstrap';
 import MainLayout from '../components/layout/MainLayout';
+import BarraFiltrosVentas from '../components/ventas/BarraFiltrosVentas';
+import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
 
 /**
- * Vista: Historico
- * Propósito: Auditoría y registros históricos de ventas, vendedores y clientes.
+ * Vista: Historico (Auditoría Completa de Ventas)
+ * Propósito: Registro histórico con diseño, filtros y botón Nueva Venta ARRIBA
+ * exactamente idéntico al de Ventas del Día.
  */
 const Historico = () => {
-  // Pestaña activa ('ventas' | 'vendedores' | 'clientes')
-  const [tab, setTab] = useState('ventas');
+  const [showModal, setShowModal] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Datos de auditoría para cada sección
-  const ventas = [
-    { id: '#V-103', fecha: '23/09/2026 18:30', barbero: 'Michael R.', cliente: 'Gabriel Torres', servicio: 'Combo Legendario', total: '$22.00', pago: 'Zelle' },
-    { id: '#V-102', fecha: '23/09/2026 17:15', barbero: 'Alexander S.', cliente: 'José Díaz', servicio: 'Corte Clásico', total: '$15.00', pago: 'Efectivo' },
-    { id: '#V-101', fecha: '23/09/2026 15:40', barbero: 'Valeria M.', cliente: 'Ricardo Peña', servicio: 'Perfilado Barba', total: '$10.00', pago: 'Pago Móvil' }
-  ];
+  // Filtros unificados idénticos
+  const [filters, setFilters] = useState({ vendedor: '', cliente: '', fechaDesde: '', fechaHasta: '' });
 
-  const vendedores = [
-    { id: '#B-04', fecha: '22/09/2026', nombre: 'Carlos Gómez', edad: 31, sexo: 'Masculino', telefono: '+58 416 3334455', rol: 'Barbero' },
-    { id: '#B-03', fecha: '18/09/2026', nombre: 'Valeria Mendoza', edad: 26, sexo: 'Femenino', telefono: '+58 424 5556677', rol: 'Estilista' },
-    { id: '#B-02', fecha: '15/09/2026', nombre: 'Alexander Salazar', edad: 24, sexo: 'Masculino', telefono: '+58 414 9876543', rol: 'Barbero' }
-  ];
+  // Lista histórica de transacciones
+  const [ventas, setVentas] = useState([
+    { id: '#V-105', fechaISO: '2026-09-24', fechaHora: '24/09/2026 14:20', vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Combo Legendario', monto: 22.0, pago: 'Zelle' },
+    { id: '#V-104', fechaISO: '2026-09-24', fechaHora: '24/09/2026 11:30', vendedor: 'Carlos Gómez', cliente: 'Daniel Morales', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
+    { id: '#V-103', fechaISO: '2026-09-23', fechaHora: '23/09/2026 18:30', vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Corte y Barba', monto: 20.0, pago: 'Pago Móvil' },
+    { id: '#V-102', fechaISO: '2026-09-23', fechaHora: '23/09/2026 17:15', vendedor: 'Alexander Salazar', cliente: 'José Díaz', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
+    { id: '#V-101', fechaISO: '2026-09-22', fechaHora: '22/09/2026 15:40', vendedor: 'Valeria Mendoza', cliente: 'Ricardo Peña', servicio: 'Perfilado Barba', monto: 10.0, pago: 'Tarjeta' },
+    { id: '#V-100', fechaISO: '2026-09-20', fechaHora: '20/09/2026 12:10', vendedor: 'Alexander Salazar', cliente: 'Andrés Castro', servicio: 'Tratamiento Capilar', monto: 12.0, pago: 'Zelle' }
+  ]);
 
-  const clientes = [
-    { id: '#C-50', fecha: '23/09/2026', nombre: 'Gabriel Torres', telefono: '+58 412 8889900', visitas: 12, estado: 'Frecuente' },
-    { id: '#C-49', fecha: '22/09/2026', nombre: 'José Manuel Díaz', telefono: '+58 414 7776655', visitas: 5, estado: 'Activo' },
-    { id: '#C-48', fecha: '20/09/2026', nombre: 'Ricardo Peña', telefono: '+58 424 1112233', visitas: 8, estado: 'Activo' }
-  ];
+  const handleFilterChange = (field, val) => setFilters((prev) => ({ ...prev, [field]: val }));
+  const handleReset = () => setFilters({ vendedor: '', cliente: '', fechaDesde: '', fechaHasta: '' });
+  const handleRefresh = () => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 500); };
+
+  // Filtrado reactivo
+  const filtered = ventas.filter((v) => {
+    if (filters.vendedor && v.vendedor !== filters.vendedor) return false;
+    if (filters.cliente && !v.cliente.toLowerCase().includes(filters.cliente.toLowerCase())) return false;
+    if (filters.fechaDesde && v.fechaISO < filters.fechaDesde) return false;
+    if (filters.fechaHasta && v.fechaISO > filters.fechaHasta) return false;
+    return true;
+  });
+
+  const totalMonto = filtered.reduce((acc, curr) => acc + curr.monto, 0);
 
   return (
-    <MainLayout title="Histórico y Auditoría" subtitle="Registro cronológico de actividades">
-      {/* Selector de pestañas */}
-      <Nav variant="pills" className="gap-2 mb-4">
-        <Nav.Item>
-          <Nav.Link active={tab === 'ventas'} onClick={() => setTab('ventas')} className={tab === 'ventas' ? 'btn-primary-gradient text-dark' : 'btn-dark-secondary'}>
-            <i className="bi bi-cash-stack me-2"></i>Histórico de Ventas
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link active={tab === 'vendedores'} onClick={() => setTab('vendedores')} className={tab === 'vendedores' ? 'btn-primary-gradient text-dark' : 'btn-dark-secondary'}>
-            <i className="bi bi-scissors me-2"></i>Histórico Vendedores
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link active={tab === 'clientes'} onClick={() => setTab('clientes')} className={tab === 'clientes' ? 'btn-primary-gradient text-dark' : 'btn-dark-secondary'}>
-            <i className="bi bi-people me-2"></i>Histórico Clientes
-          </Nav.Link>
-        </Nav.Item>
-      </Nav>
+    <MainLayout title="Histórico de Ventas" subtitle="Auditoría cronológica con filtros avanzados">
+      {/* 1. Barra superior unificada: Filtros y Botón Nueva Venta ARRIBA */}
+      <BarraFiltrosVentas
+        filters={filters} onFilterChange={handleFilterChange}
+        onReset={handleReset} onRefresh={handleRefresh}
+        isRefreshing={isRefreshing} onNuevaVenta={() => setShowModal(true)}
+      />
 
-      {/* Tablas de contenido según la pestaña activa */}
-      <Card className="dark-card p-3">
-        <Table responsive hover variant="dark" className="m-0 bg-transparent align-middle">
+      {/* 2. Resumen y Total */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <span className="small text-secondary-custom">Mostrando <strong className="text-white">{filtered.length}</strong> registro(s)</span>
+        <Badge bg="dark" className="badge-pill-custom fs-6">Total: <span className="text-white fw-bold">${totalMonto.toFixed(2)}</span></Badge>
+      </div>
+
+      {/* 3. Tabla de datos limpia en negro puro */}
+      <div className="table-container-card p-3">
+        <Table responsive hover className="m-0 align-middle">
           <thead>
-            <tr className="border-bottom border-gold text-gold-accent">
-              <th>ID</th><th>Fecha</th><th>Nombre / Ref</th><th>Detalle / Servicio</th><th>Total / Contacto</th>
+            <tr>
+              <th>ID</th><th>Fecha y Hora</th><th>Vendedor</th><th>Cliente</th><th>Servicio</th><th>Total</th><th>Pago</th>
             </tr>
           </thead>
           <tbody>
-            {tab === 'ventas' && ventas.map((v) => (
-              <tr key={v.id} className="border-bottom border-subtle">
-                <td className="fw-bold text-gold-accent">{v.id}</td><td>{v.fecha}</td>
-                <td>{v.cliente} <small className="text-muted-custom">({v.barbero})</small></td>
-                <td>{v.servicio}</td><td className="fw-bold text-white">{v.total} ({v.pago})</td>
-              </tr>
-            ))}
-            {tab === 'vendedores' && vendedores.map((b) => (
-              <tr key={b.id} className="border-bottom border-subtle">
-                <td className="fw-bold text-gold-accent">{b.id}</td><td>{b.fecha}</td>
-                <td>{b.nombre}</td><td>{b.sexo} • {b.edad} años</td><td>{b.telefono}</td>
-              </tr>
-            ))}
-            {tab === 'clientes' && clientes.map((c) => (
-              <tr key={c.id} className="border-bottom border-subtle">
-                <td className="fw-bold text-gold-accent">{c.id}</td><td>{c.fecha}</td>
-                <td>{c.nombre}</td><td>{c.visitas} visitas registradas</td><td>{c.telefono}</td>
-              </tr>
-            ))}
+            {filtered.length > 0 ? (
+              filtered.map((v) => (
+                <tr key={v.id}>
+                  <td className="fw-bold text-gold-accent">{v.id}</td><td>{v.fechaHora}</td>
+                  <td className="fw-semibold text-white"><i className="bi bi-person-badge text-gold-accent me-2"></i>{v.vendedor}</td>
+                  <td>{v.cliente}</td><td><span className="service-pill">{v.servicio}</span></td>
+                  <td className="fw-bold text-white">${v.monto.toFixed(2)}</td>
+                  <td><span className="text-gold-accent small"><i className="bi bi-credit-card me-1"></i>{v.pago}</span></td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan="7" className="text-center py-4 text-muted-custom">No se encontraron ventas con los filtros aplicados.</td></tr>
+            )}
           </tbody>
         </Table>
-      </Card>
+      </div>
+
+      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={(nv) => setVentas([nv, ...ventas])} />
     </MainLayout>
   );
 };

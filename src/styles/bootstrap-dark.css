@@ -1,67 +1,120 @@
 /**
- * ====================================================================
- * SOBRESCRITURAS DE REACT-BOOTSTRAP (TEMA NEGRO, BLANCO Y DORADO)
- * ====================================================================
- * Personalización global de componentes nativos de Bootstrap con
- * el acabado oro metálico y superficies oscuras de Legendario.
+ * SOBRESCRITURAS GLOBALES DE REACT-BOOTSTRAP (NEGRO, BLANCO Y DORADO)
+ * Altura uniforme de 46px en todos los inputs, selects y botones de control.
  */
 
-/* Tarjetas principales con borde dorado sutil */
+/* Tarjetas principales con borde dorado */
 .card.dark-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   color: var(--text-primary);
-  backdrop-filter: blur(14px);
 }
 
-/* Campos de entrada con foco dorado */
+/* Altura y dimensiones unificadas para TODOS los inputs y selects del sistema */
+.form-control.dark-input, .form-select.dark-input, input.dark-input,
+.input-group .input-group-text, .input-group .form-control.dark-input,
+.input-group .form-select.dark-input, .input-group .btn, .filter-action-btn {
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  box-sizing: border-box !important;
+  font-size: 0.93rem !important;
+}
+
 .form-control.dark-input,
-.form-select.dark-input {
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
+.form-select.dark-input,
+input.dark-input {
+  background-color: var(--bg-input) !important;
+  border: 1.5px solid #ffffff !important;
+  color: #ffffff !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0 1rem !important;
+  color-scheme: dark;
   transition: var(--transition-smooth);
 }
-
-.form-control.dark-input::placeholder {
-  color: var(--text-muted);
-}
-
+.form-control.dark-input::placeholder { color: rgba(255, 255, 255, 0.65) !important; }
 .form-control.dark-input:focus,
 .form-select.dark-input:focus {
-  background-color: var(--bg-input-focus);
-  border-color: var(--accent-gold);
-  color: var(--text-primary);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22);
+  background-color: var(--bg-input-focus) !important;
+  border-color: var(--accent-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
 }
 
-/* Botón principal dorado de acción */
-.btn-primary-gradient {
-  background: var(--accent-gradient);
-  border: none;
-  color: #0d0e11;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+/* Soporte para selector de fechas */
+input[type="date"].dark-input { display: inline-flex !important; align-items: center !important; }
+input[type="date"].dark-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(1);
+  opacity: 0.85;
+}
+
+/* Botones de acción en barras de filtros (Papelera y Refrescar) */
+.filter-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 1.05rem !important;
   transition: var(--transition-smooth);
-  box-shadow: var(--shadow-gold-btn);
 }
 
+/* Unificación para InputGroup: icono y campo como una sola unidad con borde blanco */
+.input-group .input-group-text {
+  background-color: var(--bg-input) !important;
+  border: 1.5px solid #ffffff !important;
+  border-right: none !important;
+  color: var(--accent-gold) !important;
+  border-top-left-radius: var(--radius-md) !important;
+  border-bottom-left-radius: var(--radius-md) !important;
+  padding: 0 1rem !important;
+}
+.input-group .form-control.dark-input,
+.input-group .form-select.dark-input {
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+.input-group .btn {
+  border: 1.5px solid #ffffff !important;
+  border-left: none !important;
+  background-color: var(--bg-input) !important;
+  color: #ffffff !important;
+  border-top-right-radius: var(--radius-md) !important;
+  border-bottom-right-radius: var(--radius-md) !important;
+}
+.input-group:focus-within .input-group-text,
+.input-group:focus-within .form-control.dark-input,
+.input-group:focus-within .btn { border-color: var(--accent-gold) !important; }
+
+/* Botón principal dorado de acción con resplandor dorado */
+.btn-primary-gradient {
+  background: var(--accent-gradient) !important;
+  border: none !important;
+  color: #000000 !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.68rem 1.45rem !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.3px !important;
+  transition: var(--transition-smooth) !important;
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.45) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
 .btn-primary-gradient:hover,
 .btn-primary-gradient:focus {
-  background: var(--accent-gradient-hover);
-  color: #000000;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-gold-glow);
+  background: var(--accent-gradient-hover) !important;
+  color: #000000 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 0 25px rgba(243, 209, 121, 0.65) !important;
 }
 
-/* Botón secundario oscuro con borde dorado al interactuar */
+/* Botones secundarios y casillas */
 .btn-dark-secondary {
   background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
@@ -70,14 +123,6 @@
   padding: 0.75rem 1.25rem;
   transition: var(--transition-smooth);
 }
-
-.btn-dark-secondary:hover {
-  background-color: rgba(212, 175, 55, 0.08);
-  color: var(--text-gold);
-  border-color: var(--border-gold);
-}
-
-/* Botón de borde dorado fino */
 .btn-outline-gold {
   background: transparent;
   border: 1px solid var(--accent-gold);
@@ -86,26 +131,14 @@
   font-weight: 600;
   transition: var(--transition-smooth);
 }
-
-.btn-outline-gold:hover {
-  background: var(--accent-gold);
-  color: #0c0d0e;
-}
-
-/* Casillas de verificación doradas */
+.btn-outline-gold:hover { background: var(--accent-gold); color: #0c0d0e; }
 .form-check-input.dark-check {
   background-color: var(--bg-input);
-  border-color: var(--border-subtle);
+  border: 1.5px solid #ffffff;
   cursor: pointer;
 }
-
 .form-check-input.dark-check:checked {
   background-color: var(--accent-gold);
   border-color: var(--accent-gold);
 }
-
-.form-check-label {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
+.form-check-label { color: var(--text-secondary); font-size: 0.9rem; cursor: pointer; }

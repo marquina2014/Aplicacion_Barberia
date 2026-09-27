@@ -14,7 +14,7 @@
   padding: 2.5rem 1rem;
   position: relative;
   overflow: hidden;
-  background-color: var(--bg-primary);
+  background-color: transparent;
 }
 
 /* Efectos de halo dorado de fondo (Golden Ambient Glow) */
