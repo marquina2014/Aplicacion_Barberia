@@ -1,5 +1,7 @@
 import React from 'react';
 import { Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import DarkSelect from '../common/DarkSelect';
+import DarkDatePicker from '../common/DarkDatePicker';
 
 /**
  * Componente: BarraFiltrosVentas
@@ -43,7 +45,7 @@ const BarraFiltrosVentas = ({
         </InputGroup>
 
         <Button
-          className="btn-primary-gradient d-flex align-items-center gap-2"
+          className="btn-primary-gradient top-action-btn d-flex align-items-center justify-content-center gap-2"
           onClick={onNuevaVenta}
         >
           <i className="bi bi-plus-circle-fill"></i>
@@ -59,42 +61,37 @@ const BarraFiltrosVentas = ({
               <Form.Label className="small text-secondary-custom fw-semibold mb-1">
                 <i className="bi bi-scissors text-gold-accent me-1"></i>Vendedor
               </Form.Label>
-              <Form.Select
-                className="dark-input"
+              <DarkSelect
                 value={filters.vendedor}
                 onChange={(e) => onFilterChange('vendedor', e.target.value)}
-              >
-                <option value="" className="bg-dark text-white">Todos los Vendedores</option>
-                {vendedores.map((v) => (
-                  <option key={v} value={v} className="bg-dark text-white">{v}</option>
-                ))}
-              </Form.Select>
+                options={[{ value: '', label: 'Todos los Vendedores' }, ...vendedores.map((v) => ({ value: v, label: v }))]}
+              />
             </Form.Group>
           </Col>
 
-          <Col xs={12} sm={6} md={3}>
+          <Col xs={6} md={3}>
             <Form.Group controlId="filtro-desde">
               <Form.Label className="small text-secondary-custom fw-semibold mb-1">
                 <i className="bi bi-calendar-event text-gold-accent me-1"></i>Desde
               </Form.Label>
-              <Form.Control
-                type="date"
-                className="dark-input"
+              <DarkDatePicker
+                id="filtro-desde"
                 value={filters.fechaDesde}
+                max={filters.fechaHasta || undefined}
                 onChange={(e) => onFilterChange('fechaDesde', e.target.value)}
               />
             </Form.Group>
           </Col>
 
-          <Col xs={12} sm={6} md={3}>
+          <Col xs={6} md={3}>
             <Form.Group controlId="filtro-hasta">
               <Form.Label className="small text-secondary-custom fw-semibold mb-1">
                 <i className="bi bi-calendar-check text-gold-accent me-1"></i>Hasta
               </Form.Label>
-              <Form.Control
-                type="date"
-                className="dark-input"
+              <DarkDatePicker
+                id="filtro-hasta"
                 value={filters.fechaHasta}
+                min={filters.fechaDesde || undefined}
                 onChange={(e) => onFilterChange('fechaHasta', e.target.value)}
               />
             </Form.Group>

@@ -43,7 +43,10 @@ const GestionClientes = () => {
             value={search} onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
-        <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={() => setShowModal(true)}>
+        <Button
+          className="btn-primary-gradient top-action-btn d-flex align-items-center justify-content-center gap-2"
+          onClick={() => setShowModal(true)}
+        >
           <i className="bi bi-person-plus-fill"></i><span>Registrar Cliente</span>
         </Button>
       </div>

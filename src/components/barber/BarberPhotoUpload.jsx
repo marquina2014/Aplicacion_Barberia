@@ -55,9 +55,21 @@ const BarberPhotoUpload = ({ photo, onPhotoChange, error }) => {
         className="d-none"
       />
 
-      <span className="small text-secondary-custom">
-        {photo ? 'Haz clic para cambiar la foto' : 'Fotografía del Barbero (Opcional)'}
-      </span>
+      <div className="d-flex align-items-center gap-2">
+        <span className="small text-secondary-custom">
+          {photo ? 'Haz clic para cambiar' : 'Fotografía del Barbero (Opcional)'}
+        </span>
+        {photo && (
+          <button
+            type="button"
+            className="btn btn-sm btn-link text-danger p-0 text-decoration-none"
+            onClick={(e) => { e.stopPropagation(); onPhotoChange(null); }}
+            title="Quitar fotografía"
+          >
+            <i className="bi bi-trash3"></i>
+          </button>
+        )}
+      </div>
 
       {error && <span className="text-danger small mt-1">{error}</span>}
     </div>

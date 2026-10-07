@@ -1,0 +1,66 @@
+/**
+ * ESTILOS DEL CALENDARIO PERSONALIZADO (DarkDatePicker)
+ * Negro puro, borde dorado, día elegido en degradado dorado.
+ */
+
+.dark-calendar {
+  position: fixed;
+  z-index: 2000;
+  padding: 0.85rem;
+  background-color: #000000;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), var(--shadow-gold-glow);
+  color: #ffffff;
+}
+.dark-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.dark-calendar-nav, .dark-calendar-foot button {
+  background: transparent;
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold-light);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+.dark-calendar-nav { width: 34px; height: 34px; }
+.dark-calendar-nav:hover, .dark-calendar-foot button:hover { background-color: rgba(212, 175, 55, 0.18); }
+
+.dark-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.dark-calendar-dow {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0;
+  color: var(--accent-gold);
+}
+.dark-calendar-day {
+  aspect-ratio: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-size: 0.88rem;
+  transition: var(--transition-smooth);
+}
+.dark-calendar-day:hover:not(:disabled) { background-color: rgba(212, 175, 55, 0.18); color: var(--accent-gold-light); }
+.dark-calendar-day.today { border-color: var(--accent-gold); }
+.dark-calendar-day.selected {
+  background: var(--accent-gradient);
+  color: #000000;
+  font-weight: 700;
+  border-color: transparent;
+}
+.dark-calendar-day:disabled { color: rgba(255, 255, 255, 0.22); cursor: not-allowed; }
+
+.dark-calendar-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.dark-calendar-foot button { padding: 0.35rem 0.9rem; font-size: 0.85rem; font-weight: 600; }

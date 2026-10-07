@@ -1,0 +1,77 @@
+/**
+ * ESTILOS DEL SELECTOR PERSONALIZADO (DarkSelect)
+ * Campo de 46px idéntico a los inputs y lista desplegable en negro/dorado.
+ */
+
+.dark-select { position: relative; flex: 1 1 auto; min-width: 0; width: 100%; }
+
+.dark-select-trigger {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  background-color: var(--bg-input);
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: var(--radius-md);
+  font-size: 0.93rem;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.dark-select-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dark-select-placeholder { color: rgba(255, 255, 255, 0.65); }
+.dark-select-trigger.is-open, .dark-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+}
+.dark-select-trigger.is-invalid { border-color: #dc3545; }
+.dark-select-arrow { color: var(--accent-gold); font-size: 0.85rem; transition: var(--transition-smooth); }
+.dark-select-arrow.rotate { transform: rotate(180deg); }
+
+/* Dentro de un InputGroup (con icono): se une al icono sin borde izquierdo */
+.input-group .dark-select-trigger {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Lista desplegable (se pinta en <body>, por eso es independiente del contenedor) */
+.dark-select-menu {
+  position: fixed;
+  z-index: 2000;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  background-color: #000000;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), var(--shadow-gold-glow);
+}
+.dark-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  color: #ffffff;
+  font-size: 0.93rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.dark-select-option:hover {
+  background-color: rgba(212, 175, 55, 0.14);
+  color: var(--accent-gold-light);
+}
+.dark-select-option.active {
+  background-color: rgba(212, 175, 55, 0.2);
+  color: var(--accent-gold-light);
+  font-weight: 600;
+}

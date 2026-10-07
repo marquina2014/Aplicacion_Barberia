@@ -30,7 +30,7 @@ const Dashboard = () => {
         </div>
 
         <Button
-          className="btn-primary-gradient d-flex align-items-center gap-2"
+          className="btn-primary-gradient top-action-btn d-flex align-items-center justify-content-center gap-2"
           onClick={() => setShowModal(true)}
         >
           <i className="bi bi-plus-circle-fill"></i>

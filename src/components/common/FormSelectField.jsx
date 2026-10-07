@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
+import DarkSelect from './DarkSelect';
 
 /**
  * Componente: FormSelectField
@@ -45,22 +46,13 @@ const FormSelectField = ({
           </InputGroup.Text>
         )}
 
-        <Form.Select
+        <DarkSelect
           value={value}
           onChange={onChange}
-          className="dark-input"
-          isInvalid={Boolean(error)}
-        >
-          {/* Opción vacía por defecto */}
-          <option value="" disabled className="bg-dark text-muted">
-            {placeholder}
-          </option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-dark text-white">
-              {opt.label}
-            </option>
-          ))}
-        </Form.Select>
+          options={options}
+          placeholder={placeholder}
+          invalid={Boolean(error)}
+        />
 
         {/* Mensaje de error si falla la validación */}
         {error && (

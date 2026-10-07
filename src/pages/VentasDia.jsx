@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Row, Col, Card, Table, Badge } from 'react-bootstrap';
+import { Row, Col, Badge } from 'react-bootstrap';
 import MainLayout from '../components/layout/MainLayout';
 import BarraFiltrosVentas from '../components/ventas/BarraFiltrosVentas';
+import ListaVentas from '../components/ventas/ListaVentas';
 import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
+import { getLocalDateISO, formatRelativeFechaHora } from '../utils/dateUtils';
 
 /**
  * Vista: VentasDia
@@ -12,16 +14,17 @@ import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
 const VentasDia = () => {
   const [showModal, setShowModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const todayISO = getLocalDateISO();
 
   // Filtros unificados (vendedor, cliente, fechaDesde, fechaHasta)
   const [filters, setFilters] = useState({ vendedor: '', cliente: '', fechaDesde: '', fechaHasta: '' });
 
-  // Lista de ventas del día en curso
+  // Lista de ventas del día en curso (sincronizada con la fecha local de hoy)
   const [ventas, setVentas] = useState([
-    { id: '#V-201', fechaHora: 'Hoy 18:40', fechaISO: '2026-09-24', vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Combo Legendario', monto: 22.0, pago: 'Zelle' },
-    { id: '#V-202', fechaHora: 'Hoy 17:10', fechaISO: '2026-09-24', vendedor: 'Alexander Salazar', cliente: 'José Díaz', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
-    { id: '#V-203', fechaHora: 'Hoy 15:30', fechaISO: '2026-09-24', vendedor: 'Valeria Mendoza', cliente: 'Ricardo Peña', servicio: 'Perfilado Barba', monto: 10.0, pago: 'Pago Móvil' },
-    { id: '#V-204', fechaHora: 'Hoy 14:15', fechaISO: '2026-09-24', vendedor: 'Carlos Gómez', cliente: 'Luis Medina', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' }
+    { id: '#V-201', fechaHora: formatRelativeFechaHora(0, '18:40'), fechaISO: todayISO, vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Combo Legendario', monto: 22.0, pago: 'Zelle' },
+    { id: '#V-202', fechaHora: formatRelativeFechaHora(0, '17:10'), fechaISO: todayISO, vendedor: 'Alexander Salazar', cliente: 'José Díaz', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
+    { id: '#V-203', fechaHora: formatRelativeFechaHora(0, '15:30'), fechaISO: todayISO, vendedor: 'Valeria Mendoza', cliente: 'Ricardo Peña', servicio: 'Perfilado Barba', monto: 10.0, pago: 'Pago Móvil' },
+    { id: '#V-204', fechaHora: formatRelativeFechaHora(0, '14:15'), fechaISO: todayISO, vendedor: 'Carlos Gómez', cliente: 'Luis Medina', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' }
   ]);
 
   const handleFilterChange = (field, val) => setFilters((prev) => ({ ...prev, [field]: val }));
@@ -82,27 +85,8 @@ const VentasDia = () => {
         <Badge bg="dark" className="badge-pill-custom fs-6">Total: <span className="text-white fw-bold">${totalMonto.toFixed(2)}</span></Badge>
       </div>
 
-      {/* 4. Tabla de datos limpia en negro puro */}
-      <div className="table-container-card p-3">
-        <Table responsive hover className="m-0 align-middle">
-          <thead>
-            <tr>
-              <th>ID</th><th>Fecha y Hora</th><th>Vendedor</th><th>Cliente</th><th>Servicio</th><th>Total</th><th>Pago</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((v) => (
-              <tr key={v.id}>
-                <td className="fw-bold text-gold-accent">{v.id}</td><td>{v.fechaHora}</td>
-                <td className="fw-semibold text-white"><i className="bi bi-person-badge text-gold-accent me-2"></i>{v.vendedor}</td>
-                <td>{v.cliente}</td><td><span className="service-pill">{v.servicio}</span></td>
-                <td className="fw-bold text-white">${v.monto.toFixed(2)}</td>
-                <td><span className="text-gold-accent small"><i className="bi bi-credit-card me-1"></i>{v.pago}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
+      {/* 4. Lista: tabla en PC y tarjetas en celular */}
+      <ListaVentas ventas={filtered} />
 
       <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={(nv) => setVentas([nv, ...ventas])} />
     </MainLayout>

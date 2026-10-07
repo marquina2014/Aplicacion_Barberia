@@ -108,11 +108,11 @@ const BarberForm = () => {
               placeholder="+58 414 0000000" icon="bi-telephone" error={errors.telefono} required
             />
 
-            <div className="d-flex gap-2 mt-4">
-              <Button type="submit" className="btn-primary-gradient flex-grow-1" disabled={isSubmitting}>
+            <div className="d-flex justify-content-end gap-3 mt-4 pt-3 border-top border-gold">
+              <Link to="/vendedores" className="btn btn-secondary modal-footer-btn">Cancelar</Link>
+              <Button type="submit" className="btn-primary-gradient modal-footer-btn" disabled={isSubmitting}>
                 {isSubmitting ? 'Guardando...' : (isEditMode ? 'Guardar Cambios' : 'Registrar Barbero')}
               </Button>
-              <Link to="/vendedores" className="btn btn-dark-secondary d-flex align-items-center">Cancelar</Link>
             </div>
           </Form>
         </Card>

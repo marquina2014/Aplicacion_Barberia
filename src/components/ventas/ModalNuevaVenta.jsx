@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
+import { getLocalDateISO } from '../../utils/dateUtils';
 
 /**
  * Componente: ModalNuevaVenta
@@ -52,7 +53,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     onSave({
       id: `#V-${Math.floor(100 + Math.random() * 900)}`,
       fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      fechaISO: new Date().toISOString().split('T')[0],
+      fechaISO: getLocalDateISO(),
       vendedor: form.vendedor,
       cliente: form.cliente,
       servicio: form.servicio,

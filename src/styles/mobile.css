@@ -1,0 +1,34 @@
+/**
+ * ESTILOS MÓVILES: tarjetas de venta y ajustes de barras de filtros / acciones.
+ * Se mantienen separados para no inflar dashboard.css ni global.css.
+ */
+
+/* Tarjeta de venta (lista móvil) */
+.venta-card {
+  background-color: #000000;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+}
+.venta-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 767.98px) {
+  /* Botón de acción principal a todo el ancho y buscador a todo el ancho */
+  .top-action-btn { width: 100% !important; }
+  .input-group[style] { max-width: 100% !important; width: 100%; }
+
+  /* Resumen "Mostrando N registros" y total: más compactos */
+  .badge-pill-custom.fs-6 { font-size: 0.85rem !important; }
+
+  /* Tarjetas de métricas más compactas para que no se desborden */
+  .metric-card h3 { font-size: 1.25rem; }
+  .metric-card .fs-5 { font-size: 1.05rem !important; }
+}

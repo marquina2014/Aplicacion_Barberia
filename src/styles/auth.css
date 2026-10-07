@@ -48,12 +48,12 @@
   padding: 2.25rem;
 }
 
-/* Tarjeta extendida para el formulario de barbero */
+/* Tarjeta extendida para el formulario de barbero (mismo ancho de 520px de los modales) */
 .form-barber-card {
   width: 100%;
-  max-width: 600px;
+  max-width: 520px;
   z-index: 2;
-  padding: 2.5rem;
+  padding: 2rem;
 }
 
 /* Logotipo de la marca Legendario */
