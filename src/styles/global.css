@@ -23,12 +23,12 @@
   padding: 0;
 }
 
-/* Fondo principal de la app con la imagen oficial 'sin titulo.png' */
+/* Fondo principal de la app con el logo oficial */
 body.bg-dark-app {
   background-color: var(--bg-primary);
   background-image: 
     linear-gradient(rgba(0, 0, 0, 0.94), rgba(0, 0, 0, 0.94)),
-    url('/assets/sin-titulo.png');
+    url('/assets/legendario-logo.png');
   background-position: center center;
   background-repeat: no-repeat;
   background-attachment: fixed;
