@@ -33,34 +33,47 @@ const FormSelectField = ({
     <Form.Group className="mb-3" controlId={id}>
       {/* Etiqueta descriptiva del campo */}
       {label && (
-        <Form.Label className="text-secondary-custom fw-medium mb-1 small">
+        <Form.Label className="text-secondary-custom fw-medium mb-1 small" style={{ cursor: 'pointer' }}>
           {label} {required && <span className="text-danger">*</span>}
         </Form.Label>
       )}
 
-      {/* Grupo con icono y selector personalizado */}
-      <InputGroup>
-        {icon && (
-          <InputGroup.Text className="text-gold-accent px-3">
+      {/* Selector desplegable con o sin icono (unificado sin salto de línea) */}
+      {icon ? (
+        <InputGroup className="flex-nowrap">
+          <InputGroup.Text
+            className="text-gold-accent px-3"
+            style={{ cursor: 'pointer' }}
+            onClick={() => { if (id) document.getElementById(id)?.click(); }}
+          >
             <i className={`bi ${icon}`}></i>
           </InputGroup.Text>
-        )}
-
+          <DarkSelect
+            id={id}
+            value={value}
+            onChange={onChange}
+            options={options}
+            placeholder={placeholder}
+            invalid={Boolean(error)}
+          />
+        </InputGroup>
+      ) : (
         <DarkSelect
+          id={id}
           value={value}
           onChange={onChange}
           options={options}
           placeholder={placeholder}
           invalid={Boolean(error)}
         />
+      )}
 
-        {/* Mensaje de error si falla la validación */}
-        {error && (
-          <Form.Control.Feedback type="invalid" className="d-block mt-1 small">
-            {error}
-          </Form.Control.Feedback>
-        )}
-      </InputGroup>
+      {/* Mensaje de error si falla la validación */}
+      {error && (
+        <Form.Control.Feedback type="invalid" className="d-block mt-1 small">
+          {error}
+        </Form.Control.Feedback>
+      )}
     </Form.Group>
   );
 };

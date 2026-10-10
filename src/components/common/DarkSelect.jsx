@@ -8,13 +8,14 @@ import { createPortal } from 'react-dom';
  * Mantiene la misma interfaz que el select nativo: onChange({ target: { value } }).
  *
  * @param {Object} props
+ * @param {string} [props.id] - Identificador único para asociar etiqueta y foco
  * @param {string} props.value - Valor seleccionado
  * @param {Function} props.onChange - Recibe un evento simulado { target: { value } }
  * @param {Array<{value: string, label: string}>} props.options - Opciones
  * @param {string} [props.placeholder] - Texto cuando no hay selección
  * @param {boolean} [props.invalid] - Marca el campo con error de validación
  */
-const DarkSelect = ({ value, onChange, options = [], placeholder = 'Seleccione...', invalid = false }) => {
+const DarkSelect = ({ id, value, onChange, options = [], placeholder = 'Seleccione...', invalid = false }) => {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const triggerRef = useRef(null);
@@ -22,11 +23,17 @@ const DarkSelect = ({ value, onChange, options = [], placeholder = 'Seleccione..
 
   const selected = options.find((o) => o.value === value);
 
-  // Abre el menú calculando su posición fija bajo el campo (evita recortes en modales)
+  // Abre el menú calculando su posición fija bajo el campo (o input-group)
   const toggle = () => {
     if (!open && triggerRef.current) {
-      const r = triggerRef.current.getBoundingClientRect();
-      setPos({ top: r.bottom + 6, left: r.left, width: r.width });
+      const anchor = triggerRef.current.closest('.input-group') || triggerRef.current;
+      const r = anchor.getBoundingClientRect();
+      const menuHeight = Math.min(240, options.length * 42 + 16);
+      const spaceBelow = window.innerHeight - r.bottom;
+      const top = spaceBelow < menuHeight + 10 && r.top > menuHeight
+        ? Math.max(8, r.top - menuHeight - 6)
+        : r.bottom + 6;
+      setPos({ top, left: r.left, width: r.width });
     }
     setOpen((o) => !o);
   };
@@ -60,6 +67,7 @@ const DarkSelect = ({ value, onChange, options = [], placeholder = 'Seleccione..
     <div className="dark-select">
       <button
         type="button"
+        id={id}
         ref={triggerRef}
         className={`dark-select-trigger ${open ? 'is-open' : ''} ${invalid ? 'is-invalid' : ''}`}
         onClick={toggle}

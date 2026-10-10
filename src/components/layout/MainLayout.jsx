@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Offcanvas } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import SidebarMenu from './SidebarMenu';
+import UserHeaderChip from './UserHeaderChip';
 
 /**
  * Componente: MainLayout
@@ -59,10 +60,11 @@ const MainLayout = ({ children, title, subtitle }) => {
           </div>
 
           <div className="d-flex align-items-center gap-2 gap-md-3">
-            <div className="badge-pill-custom d-none d-sm-flex align-items-center gap-2">
+            <div className="badge-pill-custom d-none d-lg-flex align-items-center gap-2">
               <span className="dot-indicator-gold"></span>
               <span className="small fw-bold">Sistema Activo</span>
             </div>
+            <UserHeaderChip />
             <Button
               variant="outline-danger"
               size="sm"

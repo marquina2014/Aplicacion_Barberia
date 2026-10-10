@@ -33,11 +33,31 @@
 .dark-select-arrow { color: var(--accent-gold); font-size: 0.85rem; transition: var(--transition-smooth); }
 .dark-select-arrow.rotate { transform: rotate(180deg); }
 
-/* Dentro de un InputGroup (con icono): se une al icono sin borde izquierdo */
+/* Soporte dentro de InputGroup (con icono): integración perfecta sin salto de línea */
+.input-group.flex-nowrap,
+.input-group:has(.dark-select) {
+  flex-wrap: nowrap !important;
+}
+.input-group > .dark-select {
+  flex: 1 1 auto !important;
+  width: 1% !important;
+  min-width: 0 !important;
+  display: flex !important;
+}
+.input-group > .input-group-text + .dark-select .dark-select-trigger,
 .input-group .dark-select-trigger {
-  border-left: none;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+.input-group:focus-within .input-group-text,
+.input-group:has(.dark-select-trigger.is-open) .input-group-text,
+.input-group:focus-within .dark-select-trigger,
+.input-group .dark-select-trigger.is-open {
+  border-color: var(--accent-gold) !important;
+}
+.input-group:has(.dark-select-trigger.is-invalid) .input-group-text {
+  border-color: #dc3545 !important;
 }
 
 /* Lista desplegable (se pinta en <body>, por eso es independiente del contenedor) */
