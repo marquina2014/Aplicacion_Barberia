@@ -73,7 +73,7 @@ const DarkDatePicker = ({ id, value, onChange, min, max }) => {
   const total = new Date(view.y, view.m + 1, 0).getDate();
   const cells = [...Array(offset).fill(null), ...Array.from({ length: total }, (_, i) => i + 1)];
   const [vy, vm, vd] = value ? value.split('-') : [];
-  const label = value ? `${vd}/${vm}/${vy}` : 'dd/mm/aaaa';
+  const label = value ? `${vd}/${vm}/${vy}` : '';
 
   return (
     <>

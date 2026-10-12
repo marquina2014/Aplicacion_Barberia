@@ -1,35 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
 import { getLocalDateISO } from '../../utils/dateUtils';
+import { getVendedores } from '../../services/api';
+import { obtenerUsuarioActual, esAdministrador } from '../../utils/sesionUsuario';
 
 /**
  * Componente: ModalNuevaVenta
  * Propósito: Ventana modal emergente para registrar ventas rápidamente
- * desde las pantallas de "Ventas del Día" e "Histórico".
- * 
- * @param {Object} props
- * @param {boolean} props.show - Controla la visibilidad del modal
- * @param {Function} props.onHide - Cierra el modal
- * @param {Function} props.onSave - Callback al guardar la nueva venta
+ * desde las pantallas de "Ventas del Día", "Histórico" y "Dashboard".
  */
 const ModalNuevaVenta = ({ show, onHide, onSave }) => {
-  // Estado local para los datos de la venta
+  const usuario = obtenerUsuarioActual();
+  const esAdmin = esAdministrador(usuario);
+
   const [form, setForm] = useState({
-    vendedor: 'Michael Rodríguez',
+    vendedor: esAdmin ? 'luis marquina' : usuario.nombre,
     cliente: '',
     servicio: 'Corte Clásico',
     monto: '15.00',
     metodoPago: 'Efectivo'
   });
 
-  const vendedores = [
-    { value: 'Michael Rodríguez', label: 'Michael Rodríguez' },
-    { value: 'Alexander Salazar', label: 'Alexander Salazar' },
-    { value: 'Valeria Mendoza', label: 'Valeria Mendoza' },
-    { value: 'Carlos Gómez', label: 'Carlos Gómez' }
-  ];
+  const [vendedores, setVendedores] = useState([
+    { value: 'luis marquina', label: 'luis marquina' },
+    { value: 'Sofia marcano', label: 'Sofia marcano' }
+  ]);
+
+  useEffect(() => {
+    if (show) {
+      const actual = obtenerUsuarioActual();
+      const admin = esAdministrador(actual);
+      getVendedores().then((lista) => {
+        if (lista?.length) {
+          setVendedores(lista.map((v) => ({ value: v.nombres, label: v.nombres })));
+          setForm((prev) => ({
+            ...prev,
+            vendedor: admin ? (prev.vendedor || lista[0].nombres) : actual.nombre
+          }));
+        }
+      });
+    }
+  }, [show]);
 
   const servicios = [
     { value: 'Corte Clásico', label: 'Corte Clásico ($15)' },
@@ -45,7 +58,6 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     { value: 'Zelle', label: 'Zelle' }
   ];
 
-  // Envío del formulario del modal
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.cliente.trim()) return;
@@ -54,14 +66,20 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       id: `#V-${Math.floor(100 + Math.random() * 900)}`,
       fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       fechaISO: getLocalDateISO(),
-      vendedor: form.vendedor,
+      vendedor: esAdmin ? form.vendedor : usuario.nombre,
       cliente: form.cliente,
       servicio: form.servicio,
       monto: parseFloat(form.monto) || 15.0,
       pago: form.metodoPago
     });
 
-    setForm({ vendedor: 'Michael Rodríguez', cliente: '', servicio: 'Corte Clásico', monto: '15.00', metodoPago: 'Efectivo' });
+    setForm({
+      vendedor: esAdmin ? 'luis marquina' : usuario.nombre,
+      cliente: '',
+      servicio: 'Corte Clásico',
+      monto: '15.00',
+      metodoPago: 'Efectivo'
+    });
     onHide();
   };
 
@@ -77,9 +95,9 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
           <Row className="g-2">
             <Col xs={12} sm={6}>
               <FormSelectField
-                id="mv-vendedor" label="Barbero (Vendedor)" value={form.vendedor}
+                id="mv-vendedor" label="Barbero (Vendedor)" value={esAdmin ? form.vendedor : usuario.nombre}
                 onChange={(e) => setForm({ ...form, vendedor: e.target.value })}
-                options={vendedores} icon="bi-scissors" required
+                options={vendedores} icon="bi-scissors" disabled={!esAdmin} required
               />
             </Col>
             <Col xs={12} sm={6}>

@@ -27,13 +27,14 @@ const FormSelectField = ({
   placeholder = 'Seleccione...',
   icon,
   error,
-  required = false
+  required = false,
+  disabled = false
 }) => {
   return (
     <Form.Group className="mb-3" controlId={id}>
       {/* Etiqueta descriptiva del campo */}
       {label && (
-        <Form.Label className="text-secondary-custom fw-medium mb-1 small" style={{ cursor: 'pointer' }}>
+        <Form.Label className="text-secondary-custom fw-medium mb-1 small" style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}>
           {label} {required && <span className="text-danger">*</span>}
         </Form.Label>
       )}
@@ -43,8 +44,8 @@ const FormSelectField = ({
         <InputGroup className="flex-nowrap">
           <InputGroup.Text
             className="text-gold-accent px-3"
-            style={{ cursor: 'pointer' }}
-            onClick={() => { if (id) document.getElementById(id)?.click(); }}
+            style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+            onClick={() => { if (!disabled && id) document.getElementById(id)?.click(); }}
           >
             <i className={`bi ${icon}`}></i>
           </InputGroup.Text>
@@ -55,6 +56,7 @@ const FormSelectField = ({
             options={options}
             placeholder={placeholder}
             invalid={Boolean(error)}
+            disabled={disabled}
           />
         </InputGroup>
       ) : (
@@ -65,6 +67,7 @@ const FormSelectField = ({
           options={options}
           placeholder={placeholder}
           invalid={Boolean(error)}
+          disabled={disabled}
         />
       )}
 

@@ -1,0 +1,416 @@
+{
+  "vendedores": [
+    {
+      "id": "1",
+      "usuario": "Marquina2014",
+      "password": "123456",
+      "email": "Luiseduardo15097@gmail.com",
+      "nombres": "luis marquina",
+      "rol": "administrador",
+      "sexo": "masculino",
+      "edad": 30,
+      "telefono": "04127153847",
+      "estado": true,
+      "fotografia": ""
+    },
+    {
+      "id": "2",
+      "usuario": "Sofiapatas",
+      "password": "123456",
+      "email": "Sofiamarcano1@gmail.com",
+      "nombres": "Sofia marcano",
+      "rol": "barbero",
+      "sexo": "femenino",
+      "edad": 24,
+      "telefono": "04241290567",
+      "estado": true,
+      "fotografia": ""
+    },
+    {
+      "id": "3",
+      "usuario": "MatiasFade",
+      "password": "123456",
+      "email": "matias.valderrama@legendario.com",
+      "nombres": "Matías Valderrama",
+      "rol": "barbero",
+      "sexo": "masculino",
+      "edad": 27,
+      "telefono": "04148392015",
+      "estado": true,
+      "fotografia": ""
+    },
+    {
+      "id": "4",
+      "usuario": "GaelBlade",
+      "password": "123456",
+      "email": "gael.montenegro@legendario.com",
+      "nombres": "Gael Montenegro",
+      "rol": "barbero",
+      "sexo": "masculino",
+      "edad": 29,
+      "telefono": "04129546182",
+      "estado": true,
+      "fotografia": ""
+    }
+  ],
+  "clientes": [
+    {
+      "id": "1",
+      "nombres": "Gabriel Torres",
+      "telefono": "+58 412 8889900",
+      "visitas": 12,
+      "ultimo": "Combo Legendario",
+      "estado": true
+    },
+    {
+      "id": "2",
+      "nombres": "José Manuel Díaz",
+      "telefono": "+58 414 7776655",
+      "visitas": 5,
+      "ultimo": "Corte Clásico",
+      "estado": true
+    },
+    {
+      "id": "3",
+      "nombres": "Ricardo Peña",
+      "telefono": "+58 424 1112233",
+      "visitas": 8,
+      "ultimo": "Combo Legendario",
+      "estado": true
+    },
+    {
+      "id": "4",
+      "nombres": "Sebastián Aristizábal",
+      "telefono": "+58 412 3049182",
+      "visitas": 15,
+      "ultimo": "Combo Legendario",
+      "estado": true
+    },
+    {
+      "id": "5",
+      "nombres": "Maximiliano Urdaneta",
+      "telefono": "+58 414 6291045",
+      "visitas": 9,
+      "ultimo": "Corte Clásico",
+      "estado": true
+    },
+    {
+      "id": "6",
+      "nombres": "Leonardo Santamaría",
+      "telefono": "+58 424 8173640",
+      "visitas": 19,
+      "ultimo": "Perfilado de Barba",
+      "estado": true
+    },
+    {
+      "id": "7",
+      "nombres": "Cristóbal Villamizar",
+      "telefono": "+58 412 5902831",
+      "visitas": 6,
+      "ultimo": "Tratamiento Capilar",
+      "estado": true
+    },
+    {
+      "id": "8",
+      "nombres": "Braulio Betancourt",
+      "telefono": "+58 416 7419023",
+      "visitas": 11,
+      "ultimo": "Combo Legendario",
+      "estado": true
+    },
+    {
+      "id": "9",
+      "nombres": "Damián Reverón",
+      "telefono": "+58 424 3384910",
+      "visitas": 4,
+      "ultimo": "Corte Clásico",
+      "estado": true
+    },
+    {
+      "id": "10",
+      "nombres": "Ignacio Salvatierra",
+      "telefono": "+58 414 9027461",
+      "visitas": 14,
+      "ultimo": "Combo Legendario",
+      "estado": true
+    },
+    {
+      "id": "11",
+      "nombres": "Thiago Altamirano",
+      "telefono": "+58 412 7751938",
+      "visitas": 7,
+      "ultimo": "Perfilado de Barba",
+      "estado": true
+    },
+    {
+      "id": "12",
+      "nombres": "Esteban Pietri",
+      "telefono": "+58 424 5168209",
+      "visitas": 3,
+      "ultimo": "Corte Clásico",
+      "estado": false
+    },
+    {
+      "id": "13",
+      "nombres": "Octavio Bustamante",
+      "telefono": "+58 414 2984517",
+      "visitas": 21,
+      "ultimo": "Tratamiento Capilar",
+      "estado": true
+    }
+  ],
+  "ventas": [
+    {
+      "id": "#V-222",
+      "fechaHora": "Hoy 19:20",
+      "fechaISO": "2026-10-12",
+      "vendedor": "luis marquina",
+      "cliente": "Sebastián Aristizábal",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-221",
+      "fechaHora": "Hoy 18:10",
+      "fechaISO": "2026-10-12",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Leonardo Santamaría",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Pago Móvil"
+    },
+    {
+      "id": "#V-220",
+      "fechaHora": "Hoy 16:45",
+      "fechaISO": "2026-10-12",
+      "vendedor": "Sofia marcano",
+      "cliente": "Maximiliano Urdaneta",
+      "servicio": "Tratamiento Capilar",
+      "monto": 18,
+      "pago": "Tarjeta"
+    },
+    {
+      "id": "#V-219",
+      "fechaHora": "Hoy 15:30",
+      "fechaISO": "2026-10-12",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Octavio Bustamante",
+      "servicio": "Perfilado de Barba",
+      "monto": 10,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-218",
+      "fechaHora": "Ayer 19:45",
+      "fechaISO": "2026-10-11",
+      "vendedor": "luis marquina",
+      "cliente": "Gabriel Torres",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-217",
+      "fechaHora": "Ayer 18:50",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Sofia marcano",
+      "cliente": "José Manuel Díaz",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-216",
+      "fechaHora": "Ayer 17:35",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Cristóbal Villamizar",
+      "servicio": "Tratamiento Capilar",
+      "monto": 18,
+      "pago": "Pago Móvil"
+    },
+    {
+      "id": "#V-215",
+      "fechaHora": "Ayer 16:20",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Braulio Betancourt",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Tarjeta"
+    },
+    {
+      "id": "#V-214",
+      "fechaHora": "Ayer 15:10",
+      "fechaISO": "2026-10-11",
+      "vendedor": "luis marquina",
+      "cliente": "Damián Reverón",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-213",
+      "fechaHora": "Ayer 14:05",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Sofia marcano",
+      "cliente": "Ignacio Salvatierra",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-212",
+      "fechaHora": "Ayer 12:50",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Thiago Altamirano",
+      "servicio": "Perfilado de Barba",
+      "monto": 10,
+      "pago": "Pago Móvil"
+    },
+    {
+      "id": "#V-211",
+      "fechaHora": "Ayer 11:40",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Ricardo Peña",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-210",
+      "fechaHora": "Ayer 10:30",
+      "fechaISO": "2026-10-11",
+      "vendedor": "luis marquina",
+      "cliente": "Esteban Pietri",
+      "servicio": "Tratamiento Capilar",
+      "monto": 18,
+      "pago": "Tarjeta"
+    },
+    {
+      "id": "#V-209",
+      "fechaHora": "Ayer 09:45",
+      "fechaISO": "2026-10-11",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Sebastián Aristizábal",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-208",
+      "fechaHora": "10/10/2026 19:15",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Octavio Bustamante",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-207",
+      "fechaHora": "10/10/2026 18:05",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Sofia marcano",
+      "cliente": "Leonardo Santamaría",
+      "servicio": "Perfilado de Barba",
+      "monto": 10,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-206",
+      "fechaHora": "10/10/2026 16:50",
+      "fechaISO": "2026-10-10",
+      "vendedor": "luis marquina",
+      "cliente": "Maximiliano Urdaneta",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Pago Móvil"
+    },
+    {
+      "id": "#V-205",
+      "fechaHora": "10/10/2026 15:40",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Ignacio Salvatierra",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Tarjeta"
+    },
+    {
+      "id": "#V-204",
+      "fechaHora": "10/10/2026 14:25",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Cristóbal Villamizar",
+      "servicio": "Tratamiento Capilar",
+      "monto": 18,
+      "pago": "Zelle"
+    },
+    {
+      "id": "#V-203",
+      "fechaHora": "10/10/2026 13:10",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Sofia marcano",
+      "cliente": "Braulio Betancourt",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-202",
+      "fechaHora": "10/10/2026 11:55",
+      "fechaISO": "2026-10-10",
+      "vendedor": "luis marquina",
+      "cliente": "Thiago Altamirano",
+      "servicio": "Perfilado de Barba",
+      "monto": 10,
+      "pago": "Pago Móvil"
+    },
+    {
+      "id": "#V-201",
+      "fechaHora": "10/10/2026 10:30",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Matías Valderrama",
+      "cliente": "Damián Reverón",
+      "servicio": "Corte Clásico",
+      "monto": 15,
+      "pago": "Efectivo"
+    },
+    {
+      "id": "#V-200",
+      "fechaHora": "10/10/2026 09:45",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Gael Montenegro",
+      "cliente": "Gabriel Torres",
+      "servicio": "Combo Legendario",
+      "monto": 22,
+      "pago": "Tarjeta"
+    },
+    {
+      "id": "#V-199",
+      "fechaHora": "10/10/2026 09:00",
+      "fechaISO": "2026-10-10",
+      "vendedor": "Sofia marcano",
+      "cliente": "Ricardo Peña",
+      "servicio": "Tratamiento Capilar",
+      "monto": 18,
+      "pago": "Zelle"
+    }
+  ],
+  "formulas": [
+    {
+      "id": "F-01",
+      "nombre": "Fórmula Inicial (18% menos la mitad)",
+      "descripcion": "18% del corte, menos la mitad y eso queda al barbero",
+      "tipo": "descuento_y_mitad",
+      "porcentajeCorte": 18,
+      "porcentajeReduccion": 50,
+      "principal": true,
+      "estado": true
+    }
+  ]
+}

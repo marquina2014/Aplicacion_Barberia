@@ -1,5 +1,5 @@
 /**
- * ESTILOS MÓVILES: tarjetas de venta y ajustes de barras de filtros / acciones.
+ * ESTILOS MÓVILES: tarjetas de venta, barras de filtros compactas y menú modal de filtros.
  * Se mantienen separados para no inflar dashboard.css ni global.css.
  */
 
@@ -20,15 +20,130 @@
   border-top: 1px solid var(--border-subtle);
 }
 
+/* Cuadrícula unificada de filtros en PC y dentro del menú modal móvil */
+.filters-grid-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 0.85rem !important;
+  align-items: end !important;
+  width: 100% !important;
+}
+.mobile-filters-modal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.75rem !important;
+  align-items: end !important;
+  width: 100% !important;
+}
+.filters-grid-row > *,
+.mobile-filters-modal-grid > * {
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+.filters-grid-row .form-label,
+.mobile-filters-modal-grid .form-label {
+  display: flex !important;
+  align-items: center !important;
+  height: 20px !important;
+  margin-bottom: 0.35rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.filters-grid-row .form-control.dark-input,
+.filters-grid-row .dark-select,
+.filters-grid-row .dark-select-trigger {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  box-sizing: border-box !important;
+}
+.mobile-filters-modal-grid .form-control.dark-input,
+.mobile-filters-modal-grid .dark-select,
+.mobile-filters-modal-grid .dark-select-trigger {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  font-size: 0.88rem !important;
+  box-sizing: border-box !important;
+}
+
+.btn-mobile-filters {
+  display: none !important;
+}
+
+@media (max-width: 991.98px) {
+  .btn-mobile-filters {
+    display: inline-flex !important;
+  }
+  /* En celular/tablet: ocultar filtros secundarios de la tarjeta y dejar solo 2 principales */
+  .filters-grid-row .filter-extra-mobile {
+    display: none !important;
+  }
+  .filters-grid-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+  }
+  /* Fila inferior de 3 botones del mismo tamaño en móvil: [Filtros] [Limpiar] [Refrescar] */
+  .filters-grid-row .filter-actions-cell {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .filters-grid-row .filter-actions-cell .filter-action-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 0.4rem !important;
+  }
+}
+
 @media (max-width: 767.98px) {
-  /* Botón de acción principal a todo el ancho y buscador a todo el ancho */
-  .top-action-btn { width: 100% !important; }
-  .input-group[style] { max-width: 100% !important; width: 100%; }
+  /* En celular: todos los filtros y botones de filtro tienen el mismo alto (42px) */
+  .filters-grid-row .form-control.dark-input,
+  .filters-grid-row .dark-select,
+  .filters-grid-row .dark-select-trigger,
+  .filters-grid-row .filter-action-btn {
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    font-size: 0.88rem !important;
+  }
 
-  /* Resumen "Mostrando N registros" y total: más compactos */
+  /* Botones superiores en celular: mismo tamaño y proporción móvil entre ellos */
+  .top-action-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    font-size: 0.88rem !important;
+  }
+  .top-actions-group {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem !important;
+    width: 100% !important;
+  }
+  .top-actions-group .top-action-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 0.65rem !important;
+    font-size: 0.88rem !important;
+  }
   .badge-pill-custom.fs-6 { font-size: 0.85rem !important; }
-
-  /* Tarjetas de métricas más compactas para que no se desborden */
   .metric-card h3 { font-size: 1.25rem; }
   .metric-card .fs-5 { font-size: 1.05rem !important; }
+}
+
+@media (max-width: 380px) {
+  .top-actions-group { grid-template-columns: 1fr; }
+  .mobile-filters-modal-grid { grid-template-columns: 1fr !important; }
 }

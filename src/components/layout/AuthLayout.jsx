@@ -25,7 +25,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
         <Card className="dark-card auth-card">
           {/* Cabecera con logotipo de marca */}
           <div className="d-flex justify-content-center mb-4">
-            <BrandLogo title="Cofeed Barber" subtitle="Gestión Premium" size="large" />
+            <BrandLogo size="large" />
           </div>
 
           {/* Títulos y descripción de la vista */}

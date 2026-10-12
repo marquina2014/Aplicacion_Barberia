@@ -3,28 +3,27 @@ import { createPortal } from 'react-dom';
 
 /**
  * Componente: DarkSelect
- * Propósito: Selector desplegable propio (reemplaza al <select> nativo, cuyo
- * menú no se puede estilizar). Lista en negro con borde dorado y resaltado dorado.
- * Mantiene la misma interfaz que el select nativo: onChange({ target: { value } }).
- *
- * @param {Object} props
- * @param {string} [props.id] - Identificador único para asociar etiqueta y foco
- * @param {string} props.value - Valor seleccionado
- * @param {Function} props.onChange - Recibe un evento simulado { target: { value } }
- * @param {Array<{value: string, label: string}>} props.options - Opciones
- * @param {string} [props.placeholder] - Texto cuando no hay selección
- * @param {boolean} [props.invalid] - Marca el campo con error de validación
+ * Propósito: Selector desplegable propio en negro con borde dorado.
+ * Soporta estado bloqueado (disabled) para restringir cambios según rol.
  */
-const DarkSelect = ({ id, value, onChange, options = [], placeholder = 'Seleccione...', invalid = false }) => {
+const DarkSelect = ({
+  id,
+  value,
+  onChange,
+  options = [],
+  placeholder = 'Seleccione...',
+  invalid = false,
+  disabled = false
+}) => {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
 
-  const selected = options.find((o) => o.value === value);
+  const selected = value !== '' ? options.find((o) => o.value === value) : null;
 
-  // Abre el menú calculando su posición fija bajo el campo (o input-group)
   const toggle = () => {
+    if (disabled) return;
     if (!open && triggerRef.current) {
       const anchor = triggerRef.current.closest('.input-group') || triggerRef.current;
       const r = anchor.getBoundingClientRect();
@@ -43,7 +42,6 @@ const DarkSelect = ({ id, value, onChange, options = [], placeholder = 'Seleccio
     setOpen(false);
   };
 
-  // Cierra al hacer clic fuera, presionar Escape, hacer scroll o redimensionar
   useEffect(() => {
     if (!open) return undefined;
     const close = () => setOpen(false);
@@ -69,7 +67,8 @@ const DarkSelect = ({ id, value, onChange, options = [], placeholder = 'Seleccio
         type="button"
         id={id}
         ref={triggerRef}
-        className={`dark-select-trigger ${open ? 'is-open' : ''} ${invalid ? 'is-invalid' : ''}`}
+        disabled={disabled}
+        className={`dark-select-trigger ${open ? 'is-open' : ''} ${invalid ? 'is-invalid' : ''} ${disabled ? 'is-disabled' : ''}`}
         onClick={toggle}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -77,10 +76,10 @@ const DarkSelect = ({ id, value, onChange, options = [], placeholder = 'Seleccio
         <span className={selected ? '' : 'dark-select-placeholder'}>
           {selected ? selected.label : placeholder}
         </span>
-        <i className={`bi bi-chevron-down dark-select-arrow ${open ? 'rotate' : ''}`}></i>
+        <i className={`bi ${disabled ? 'bi-lock-fill' : 'bi-chevron-down'} dark-select-arrow ${open ? 'rotate' : ''}`}></i>
       </button>
 
-      {open && createPortal(
+      {open && !disabled && createPortal(
         <ul
           ref={menuRef}
           role="listbox"

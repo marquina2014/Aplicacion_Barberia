@@ -1,67 +1,112 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from 'react-bootstrap';
 import MainLayout from '../components/layout/MainLayout';
 import BarraFiltrosVentas from '../components/ventas/BarraFiltrosVentas';
 import ListaVentas from '../components/ventas/ListaVentas';
 import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
-import { getRelativeDateISO, formatRelativeFechaHora } from '../utils/dateUtils';
+import { getVentas, createVenta, getVendedores, getFormulas } from '../services/api';
+import { obtenerUsuarioActual, esAdministrador } from '../utils/sesionUsuario';
+import { exportarVentasExcel } from '../utils/exportarExcel';
+import { FORMULA_INICIAL, obtenerFormulaActiva, calcularMontoFinal } from '../utils/formulasUtils';
 
 /**
  * Vista: Historico (Auditoría Completa de Ventas)
- * Propósito: Registro histórico con diseño, filtros y botón Nueva Venta ARRIBA
- * exactamente idéntico al de Ventas del Día.
+ * Propósito: Registro histórico conectado a JSON Server con Monto Original y Monto Final.
  */
 const Historico = () => {
+  const usuario = obtenerUsuarioActual();
+  const esAdmin = esAdministrador(usuario);
+  const vendedorInicial = esAdmin ? '' : usuario.nombre;
+
   const [showModal, setShowModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const initFilters = {
+    vendedor: vendedorInicial,
+    cliente: '',
+    fechaDesde: '',
+    fechaHasta: '',
+    servicio: '',
+    pago: ''
+  };
+  const [filters, setFilters] = useState(initFilters);
+  const [ventas, setVentas] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
+  const [formulaActiva, setFormulaActiva] = useState(FORMULA_INICIAL);
 
-  // Filtros unificados idénticos
-  const [filters, setFilters] = useState({ vendedor: '', cliente: '', fechaDesde: '', fechaHasta: '' });
+  const cargarDatos = async () => {
+    const [listaVentas, listaVendedores, listaFormulas] = await Promise.all([
+      getVentas(), getVendedores(), getFormulas()
+    ]);
+    setVentas(listaVentas);
+    setVendedores(listaVendedores.map((v) => v.nombres));
+    setFormulaActiva(obtenerFormulaActiva(listaFormulas));
+  };
 
-  // Lista histórica de transacciones (fechas dinámicas relativas al día en curso)
-  const [ventas, setVentas] = useState([
-    { id: '#V-105', fechaISO: getRelativeDateISO(0), fechaHora: formatRelativeFechaHora(0, '14:20'), vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Combo Legendario', monto: 22.0, pago: 'Zelle' },
-    { id: '#V-104', fechaISO: getRelativeDateISO(0), fechaHora: formatRelativeFechaHora(0, '11:30'), vendedor: 'Carlos Gómez', cliente: 'Daniel Morales', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
-    { id: '#V-103', fechaISO: getRelativeDateISO(-1), fechaHora: formatRelativeFechaHora(-1, '18:30'), vendedor: 'Michael Rodríguez', cliente: 'Gabriel Torres', servicio: 'Corte y Barba', monto: 20.0, pago: 'Pago Móvil' },
-    { id: '#V-102', fechaISO: getRelativeDateISO(-1), fechaHora: formatRelativeFechaHora(-1, '17:15'), vendedor: 'Alexander Salazar', cliente: 'José Díaz', servicio: 'Corte Clásico', monto: 15.0, pago: 'Efectivo' },
-    { id: '#V-101', fechaISO: getRelativeDateISO(-2), fechaHora: formatRelativeFechaHora(-2, '15:40'), vendedor: 'Valeria Mendoza', cliente: 'Ricardo Peña', servicio: 'Perfilado Barba', monto: 10.0, pago: 'Tarjeta' },
-    { id: '#V-100', fechaISO: getRelativeDateISO(-4), fechaHora: formatRelativeFechaHora(-4, '12:10'), vendedor: 'Alexander Salazar', cliente: 'Andrés Castro', servicio: 'Tratamiento Capilar', monto: 12.0, pago: 'Zelle' }
-  ]);
+  useEffect(() => { cargarDatos(); }, []);
 
-  const handleFilterChange = (field, val) => setFilters((prev) => ({ ...prev, [field]: val }));
-  const handleReset = () => setFilters({ vendedor: '', cliente: '', fechaDesde: '', fechaHasta: '' });
-  const handleRefresh = () => { setIsRefreshing(true); setTimeout(() => setIsRefreshing(false), 500); };
+  const handleFilterChange = (field, val) => {
+    if (field === 'vendedor' && !esAdmin) return;
+    setFilters((prev) => ({ ...prev, [field]: val }));
+  };
+  const handleReset = () =>
+    setFilters({ ...initFilters, vendedor: esAdmin ? '' : usuario.nombre });
 
-  // Filtrado reactivo
-  const filtered = ventas.filter((v) => {
-    if (filters.vendedor && v.vendedor !== filters.vendedor) return false;
-    if (filters.cliente && !v.cliente.toLowerCase().includes(filters.cliente.toLowerCase())) return false;
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await cargarDatos();
+    setTimeout(() => setIsRefreshing(false), 350);
+  };
+
+  const handleSaveVenta = async (nv) => {
+    const creada = await createVenta(nv);
+    setVentas((prev) => [creada, ...prev]);
+  };
+
+  const cumpleFiltro = (v) => {
+    if (filters.vendedor && (v.vendedor || '').toLowerCase() !== filters.vendedor.toLowerCase()) return false;
+    if (filters.cliente && !(v.cliente || '').toLowerCase().includes(filters.cliente.toLowerCase())) return false;
     if (filters.fechaDesde && v.fechaISO < filters.fechaDesde) return false;
     if (filters.fechaHasta && v.fechaISO > filters.fechaHasta) return false;
+    if (filters.servicio && (v.servicio || '').toLowerCase() !== filters.servicio.toLowerCase()) return false;
+    if (filters.pago && (v.pago || '').toLowerCase() !== filters.pago.toLowerCase()) return false;
     return true;
-  });
+  };
 
-  const totalMonto = filtered.reduce((acc, curr) => acc + curr.monto, 0);
+  const filtered = ventas.filter(cumpleFiltro);
+  const totalMonto = filtered.reduce((acc, curr) => acc + Number(curr.monto || 0), 0);
+  const totalFinal = filtered.reduce((acc, curr) => acc + calcularMontoFinal(curr.monto, formulaActiva), 0);
+  const visibles = filtered.slice(0, 30);
+
+  const handleExportar = async () => {
+    const todas = await getVentas();
+    exportarVentasExcel(todas.filter(cumpleFiltro), 'Historico_Ventas_Legendario', formulaActiva);
+  };
 
   return (
     <MainLayout title="Histórico de Ventas" subtitle="Auditoría cronológica con filtros avanzados">
-      {/* 1. Barra superior unificada: Filtros y Botón Nueva Venta ARRIBA */}
       <BarraFiltrosVentas
+        modo="historico"
         filters={filters} onFilterChange={handleFilterChange}
         onReset={handleReset} onRefresh={handleRefresh}
         isRefreshing={isRefreshing} onNuevaVenta={() => setShowModal(true)}
+        onExportExcel={handleExportar}
+        vendedores={vendedores.length ? vendedores : undefined}
+        vendedorDisabled={!esAdmin}
       />
 
-      {/* 2. Resumen y Total */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <span className="small text-secondary-custom">Mostrando <strong className="text-white">{filtered.length}</strong> registro(s)</span>
-        <Badge bg="dark" className="badge-pill-custom fs-6">Total: <span className="text-white fw-bold">${totalMonto.toFixed(2)}</span></Badge>
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <span className="small text-secondary-custom">
+          Mostrando <strong className="text-white">{visibles.length}</strong> de <strong className="text-white">{filtered.length}</strong> registro(s)
+        </span>
+        <div className="d-flex gap-2">
+          <Badge bg="dark" className="badge-pill-custom fs-6">Original: <span className="text-white fw-bold">${totalMonto.toFixed(2)}</span></Badge>
+          <Badge bg="dark" className="badge-pill-custom fs-6">Final: <span className="text-white fw-bold">${totalFinal.toFixed(2)}</span></Badge>
+        </div>
       </div>
 
-      {/* 3. Lista: tabla en PC y tarjetas en celular */}
-      <ListaVentas ventas={filtered} />
+      <ListaVentas ventas={visibles} formula={formulaActiva} />
 
-      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={(nv) => setVentas([nv, ...ventas])} />
+      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={handleSaveVenta} />
     </MainLayout>
   );
 };

@@ -3,26 +3,26 @@ import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
+import { createVenta } from '../services/api';
+import { esAdministrador } from '../utils/sesionUsuario';
 
 /**
  * Vista: Dashboard
- * Propósito: Panel de inicio con botón de acción superior idéntico en tamaño y posición,
- * métricas clave y accesos directos a las pantallas operativas.
+ * Propósito: Panel de inicio con métricas clave y accesos directos según el rol del usuario.
  */
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
+  const esAdmin = esAdministrador();
 
-  // Tarjetas métricas del día para la barbería
   const metrics = [
-    { title: 'Ventas de Hoy', value: '$420.00', icon: 'bi-cash-stack', detail: '14 servicios realizados' },
+    { title: 'Ventas de Hoy', value: '$65.00', icon: 'bi-cash-stack', detail: 'Jornada activa (4 servicios)' },
     { title: 'Vendedores Activos', value: '4 Barberos', icon: 'bi-scissors', detail: 'Turno completo' },
-    { title: 'Clientes Atendidos', value: '18 Clientes', icon: 'bi-people-fill', detail: '3 en espera' },
-    { title: 'Ticket Promedio', value: '$23.30', icon: 'bi-graph-up-arrow', detail: '+12% vs ayer' }
+    { title: 'Clientes Registrados', value: '13 Clientes', icon: 'bi-people-fill', detail: 'Directorio activo' },
+    { title: 'Ticket Promedio', value: '$16.25', icon: 'bi-graph-up-arrow', detail: 'Promedio del día' }
   ];
 
   return (
     <MainLayout title="Panel de Inicio" subtitle="Bienvenido a Legendario Barber Shop">
-      {/* Barra superior con botón de acción en la esquina superior derecha */}
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
           <h5 className="fw-bold text-white mb-0">Resumen Operativo</h5>
@@ -38,7 +38,6 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      {/* 1. Métricas principales en tarjetas oscuras con borde dorado */}
       <Row className="g-3 mb-4">
         {metrics.map((m, idx) => (
           <Col xs={12} sm={6} lg={3} key={idx}>
@@ -55,10 +54,9 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* 2. Accesos directos a las pantallas requeridas */}
       <h5 className="fw-bold text-white mb-3">Acciones Rápidas</h5>
       <Row className="g-3">
-        <Col xs={12} md={4}>
+        <Col xs={12} md={esAdmin ? 4 : 6}>
           <Card className="dark-card p-4 text-center h-100">
             <i className="bi bi-calendar2-day-fill fs-1 text-gold-accent mb-2"></i>
             <h5 className="fw-bold text-white">Ventas del Día</h5>
@@ -69,30 +67,45 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col xs={12} md={4}>
-          <Card className="dark-card p-4 text-center h-100">
-            <i className="bi bi-scissors fs-1 text-gold-accent mb-2"></i>
-            <h5 className="fw-bold text-white">Gestión de Vendedores</h5>
-            <p className="text-secondary-custom small mb-3">Administra los barberos, crea nuevos o edita sus datos.</p>
-            <Link to="/vendedores" className="btn btn-outline-gold mt-auto">
-              Ver Vendedores
-            </Link>
-          </Card>
-        </Col>
+        {esAdmin ? (
+          <>
+            <Col xs={12} md={4}>
+              <Card className="dark-card p-4 text-center h-100">
+                <i className="bi bi-scissors fs-1 text-gold-accent mb-2"></i>
+                <h5 className="fw-bold text-white">Gestión de Vendedores</h5>
+                <p className="text-secondary-custom small mb-3">Administra los barberos, crea nuevos o edita sus datos.</p>
+                <Link to="/vendedores" className="btn btn-outline-gold mt-auto">
+                  Ver Vendedores
+                </Link>
+              </Card>
+            </Col>
 
-        <Col xs={12} md={4}>
-          <Card className="dark-card p-4 text-center h-100">
-            <i className="bi bi-people-fill fs-1 text-gold-accent mb-2"></i>
-            <h5 className="fw-bold text-white">Gestión de Clientes</h5>
-            <p className="text-secondary-custom small mb-3">Consulta el directorio de clientes y su fidelidad.</p>
-            <Link to="/clientes" className="btn btn-outline-gold mt-auto">
-              Ver Clientes
-            </Link>
-          </Card>
-        </Col>
+            <Col xs={12} md={4}>
+              <Card className="dark-card p-4 text-center h-100">
+                <i className="bi bi-people-fill fs-1 text-gold-accent mb-2"></i>
+                <h5 className="fw-bold text-white">Gestión de Clientes</h5>
+                <p className="text-secondary-custom small mb-3">Consulta el directorio de clientes y su fidelidad.</p>
+                <Link to="/clientes" className="btn btn-outline-gold mt-auto">
+                  Ver Clientes
+                </Link>
+              </Card>
+            </Col>
+          </>
+        ) : (
+          <Col xs={12} md={6}>
+            <Card className="dark-card p-4 text-center h-100">
+              <i className="bi bi-clock-history fs-1 text-gold-accent mb-2"></i>
+              <h5 className="fw-bold text-white">Histórico de Ventas</h5>
+              <p className="text-secondary-custom small mb-3">Consulta el historial de tus servicios realizados.</p>
+              <Link to="/historico" className="btn btn-outline-gold mt-auto">
+                Ver Histórico
+              </Link>
+            </Card>
+          </Col>
+        )}
       </Row>
 
-      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={() => {}} />
+      <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={(nv) => createVenta(nv)} />
     </MainLayout>
   );
 };

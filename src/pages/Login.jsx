@@ -3,49 +3,66 @@ import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/layout/AuthLayout';
 import FormInputField from '../components/common/FormInputField';
+import { getVendedores } from '../services/api';
+import { guardarUsuarioActual } from '../utils/sesionUsuario';
 
 /**
  * Vista: Login
  * Propósito: Pantalla de inicio de sesión de Legendario Barber Shop.
- * Tema: Negro, Blanco y Dorado. No incluye enlaces de registro según instrucción.
+ * Autentica por Nombre de Usuario (o correo) y Contraseña contra JSON Server.
  */
 const Login = () => {
   const navigate = useNavigate();
 
-  // Estado del formulario
-  const [formData, setFormData] = useState({ email: '', password: '', rememberMe: false });
+  const [formData, setFormData] = useState({ usuario: '', password: '', rememberMe: false });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Manejador de cambios
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
-  // Validación de credenciales
   const validateForm = () => {
     const errs = {};
-    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) {
-      errs.email = 'Introduce un correo electrónico válido';
+    if (!formData.usuario.trim()) {
+      errs.usuario = 'Introduce tu nombre de usuario';
     }
-    if (!formData.password || formData.password.length < 6) {
-      errs.password = 'La contraseña debe tener al menos 6 caracteres';
+    if (!formData.password) {
+      errs.password = 'Introduce tu contraseña';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  // Envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    const lista = await getVendedores();
+    const userKey = formData.usuario.trim().toLowerCase();
+    const encontrado = lista.find(
+      (v) =>
+        (v.usuario || '').toLowerCase() === userKey ||
+        (v.email || '').toLowerCase() === userKey
+    );
+
+    if (!encontrado || (encontrado.password && String(encontrado.password) !== String(formData.password))) {
+      setErrors({ password: 'Usuario o contraseña incorrectos' });
       setIsSubmitting(false);
-      navigate('/dashboard');
-    }, 600);
+      return;
+    }
+    if (encontrado.estado === false) {
+      setErrors({ usuario: 'Este usuario se encuentra inactivo' });
+      setIsSubmitting(false);
+      return;
+    }
+
+    guardarUsuarioActual(encontrado);
+    setIsSubmitting(false);
+    navigate('/dashboard', { replace: true });
   };
 
   return (
@@ -54,19 +71,19 @@ const Login = () => {
       subtitle="Panel de administración de Legendario Barber Shop"
     >
       <Form onSubmit={handleSubmit} noValidate>
-        {/* Campo de Correo Electrónico */}
+        {/* Campo de Nombre de Usuario */}
         <FormInputField
-          id="login-email"
-          label="Correo Electrónico"
-          type="email"
-          value={formData.email}
+          id="login-usuario"
+          label="Nombre de Usuario"
+          type="text"
+          value={formData.usuario}
           onChange={(e) => {
-            setFormData({ ...formData, email: e.target.value });
-            if (errors.email) setErrors({ ...errors, email: null });
+            setFormData({ ...formData, usuario: e.target.value });
+            if (errors.usuario) setErrors({ ...errors, usuario: null });
           }}
-          placeholder="admin@legendario.com"
-          icon="bi-envelope"
-          error={errors.email}
+          placeholder="Ej: Marquina2014"
+          icon="bi-person"
+          error={errors.usuario}
           required
         />
 

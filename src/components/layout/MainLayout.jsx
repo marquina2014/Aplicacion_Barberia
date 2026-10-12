@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Offcanvas } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import SidebarMenu from './SidebarMenu';
 import UserHeaderChip from './UserHeaderChip';
+import { cerrarSesion, tieneSesionActiva } from '../../utils/sesionUsuario';
 
 /**
  * Componente: MainLayout
  * Propósito: Estructura base unificada y 100% responsiva. En escritorio muestra
  * el menú lateral fijo de 280px; en celulares se colapsa y activa el menú
  * hamburguesa dorado con cajón deslizante (Offcanvas).
- * 
- * @param {Object} props
- * @param {React.ReactNode} props.children - Vista interna a renderizar
- * @param {string} props.title - Título de la vista actual
- * @param {string} [props.subtitle] - Descripción breve de la vista
  */
 const MainLayout = ({ children, title, subtitle }) => {
   const navigate = useNavigate();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (tieneSesionActiva() && (window.location.pathname === '/login' || window.location.pathname === '/')) {
+        navigate('/dashboard', { replace: true });
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    cerrarSesion();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className="dashboard-layout">
@@ -69,7 +80,7 @@ const MainLayout = ({ children, title, subtitle }) => {
               variant="outline-danger"
               size="sm"
               className="rounded-pill px-3"
-              onClick={() => navigate('/login')}
+              onClick={handleLogout}
             >
               <i className="bi bi-box-arrow-right me-1"></i>
               <span className="d-none d-sm-inline">Salir</span>

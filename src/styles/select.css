@@ -30,6 +30,7 @@
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
 }
 .dark-select-trigger.is-invalid { border-color: #dc3545; }
+.dark-select-trigger.is-disabled { opacity: 0.75; cursor: not-allowed; border-color: rgba(255, 255, 255, 0.45); }
 .dark-select-arrow { color: var(--accent-gold); font-size: 0.85rem; transition: var(--transition-smooth); }
 .dark-select-arrow.rotate { transform: rotate(180deg); }
 

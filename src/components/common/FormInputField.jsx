@@ -44,7 +44,7 @@ const FormInputField = ({
       )}
 
       {/* Grupo de entrada con iconos integrados */}
-      <InputGroup>
+      <InputGroup className="flex-nowrap">
         {/* Icono decorativo inicial si se especifica */}
         {icon && (
           <InputGroup.Text className="text-gold-accent px-3">
@@ -75,14 +75,14 @@ const FormInputField = ({
             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
           </Button>
         )}
-
-        {/* Mensaje de retroalimentación de error */}
-        {error && (
-          <Form.Control.Feedback type="invalid" className="d-block mt-1 small">
-            {error}
-          </Form.Control.Feedback>
-        )}
       </InputGroup>
+
+      {/* Mensaje de retroalimentación de error */}
+      {error && (
+        <Form.Control.Feedback type="invalid" className="d-block mt-1 small">
+          {error}
+        </Form.Control.Feedback>
+      )}
     </Form.Group>
   );
 };
