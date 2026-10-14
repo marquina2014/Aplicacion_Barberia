@@ -1,15 +1,17 @@
 /**
  * Utilidades de cálculo para las Fórmulas de comisión / monto final del barbero.
- * Fórmula inicial por defecto: 18% del corte, menos la mitad (50%).
+ * Fórmula inicial por defecto: 18% del corte, menos la mitad (2 pasos).
  */
 
 export const FORMULA_INICIAL = {
-  id: 'F-01',
-  nombre: 'Fórmula Inicial (18% menos la mitad)',
-  descripcion: '18% del corte, menos la mitad y eso queda al barbero',
+  id: '#F-01',
+  nombre: 'Fórmula Inicial',
+  descripcion: '18% del corte, menos la mitad',
   tipo: 'descuento_y_mitad',
   porcentajeCorte: 18,
   porcentajeReduccion: 50,
+  pasos: 2,
+  fechaCreacion: '2026-10-12',
   principal: true,
   estado: true
 };

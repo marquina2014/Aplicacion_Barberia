@@ -403,12 +403,14 @@
   ],
   "formulas": [
     {
-      "id": "F-01",
-      "nombre": "Fórmula Inicial (18% menos la mitad)",
-      "descripcion": "18% del corte, menos la mitad y eso queda al barbero",
+      "id": "#F-01",
+      "nombre": "Fórmula Inicial",
+      "descripcion": "18% del corte, menos la mitad",
       "tipo": "descuento_y_mitad",
       "porcentajeCorte": 18,
       "porcentajeReduccion": 50,
+      "pasos": 2,
+      "fechaCreacion": "2026-10-12",
       "principal": true,
       "estado": true
     }

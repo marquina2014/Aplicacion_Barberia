@@ -4,8 +4,8 @@ import { calcularMontoFinal, FORMULA_INICIAL } from '../../utils/formulasUtils';
 
 /**
  * Componente: ListaVentas
- * Propósito: Lista de ventas compartida por "Ventas del Día", "Histórico" y "Fórmulas".
- * - Muestra Monto Original y Monto Final (calculado según la fórmula activa).
+ * Propósito: Lista de ventas compartida por "Ventas del Día" e "Histórico".
+ * Incluye columnas de Fórmula Aplicada, Monto Original y Monto Final (lo que queda al barbero).
  */
 const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
   if (ventas.length === 0) {
@@ -20,6 +20,9 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
   const obtenerFinal = (v) =>
     v.montoFinal !== undefined ? Number(v.montoFinal) : calcularMontoFinal(v.monto, formula);
 
+  const obtenerNombreFormula = (v) =>
+    v.formulaAplicada || formula?.nombre || FORMULA_INICIAL.nombre;
+
   return (
     <>
       <div className="table-container-card p-3 d-none d-md-block">
@@ -31,6 +34,7 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
               <th>Vendedor</th>
               <th>Cliente</th>
               <th>Servicio</th>
+              <th>Fórmula Aplicada</th>
               <th>Monto Original</th>
               <th>Monto Final</th>
               <th>Pago</th>
@@ -40,6 +44,7 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
             {ventas.map((v) => {
               const montoOrig = Number(v.monto || 0);
               const montoFin = obtenerFinal(v);
+              const nombreFormula = obtenerNombreFormula(v);
               return (
                 <tr key={v.id}>
                   <td className="fw-bold text-gold-accent">{v.id}</td>
@@ -49,6 +54,11 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
                   </td>
                   <td>{v.cliente}</td>
                   <td><span className="service-pill">{v.servicio}</span></td>
+                  <td>
+                    <span className="service-pill" title={formula?.descripcion}>
+                      <i className="bi bi-calculator text-gold-accent me-1"></i>{nombreFormula}
+                    </span>
+                  </td>
                   <td className="fw-semibold text-secondary-custom">${montoOrig.toFixed(2)}</td>
                   <td className="fw-bold text-gold-accent">${montoFin.toFixed(2)}</td>
                   <td>
@@ -67,6 +77,7 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
         {ventas.map((v) => {
           const montoOrig = Number(v.monto || 0);
           const montoFin = obtenerFinal(v);
+          const nombreFormula = obtenerNombreFormula(v);
           return (
             <div key={v.id} className="venta-card">
               <div className="d-flex justify-content-between align-items-center mb-2">
@@ -79,8 +90,13 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
               <small className="text-secondary-custom d-block mb-2">
                 <i className="bi bi-person-badge text-gold-accent me-2"></i>{v.vendedor}
               </small>
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                 <span className="service-pill">{v.servicio}</span>
+                <span className="service-pill">
+                  <i className="bi bi-calculator text-gold-accent me-1"></i>{nombreFormula}
+                </span>
+              </div>
+              <div className="d-flex justify-content-end">
                 <span className="text-gold-accent small">
                   <i className="bi bi-credit-card me-1"></i>{v.pago}
                 </span>

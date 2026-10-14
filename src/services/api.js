@@ -17,7 +17,7 @@ const getHeaders = (json = false) => {
 const leerLocal = (tabla) => {
   const base = seedData[tabla] || [];
   try {
-    const raw = localStorage.getItem(`legendario_db_v2_${tabla}`);
+    const raw = localStorage.getItem(`legendario_db_v3_${tabla}`);
     if (raw) {
       const guardado = descifrarDatos(raw) || JSON.parse(raw);
       if (Array.isArray(guardado)) {
@@ -32,7 +32,7 @@ const leerLocal = (tabla) => {
 
 const escribirLocal = (tabla, lista) => {
   try {
-    localStorage.setItem(`legendario_db_v2_${tabla}`, cifrarDatos(lista));
+    localStorage.setItem(`legendario_db_v3_${tabla}`, cifrarDatos(lista));
   } catch (_) {}
   return lista;
 };
@@ -127,11 +127,13 @@ export const getFormulas = () => fetchTabla('formulas');
 
 export const saveFormula = async (formData, editingId = null) => {
   const listaActual = leerLocal('formulas');
-  const id = editingId || `F-0${listaActual.length + 1}`;
+  const id = editingId || `#F-0${listaActual.length + 1}`;
   const payload = {
     ...formData, id: String(id),
     porcentajeCorte: Number(formData.porcentajeCorte ?? 18),
     porcentajeReduccion: Number(formData.porcentajeReduccion ?? 50),
+    pasos: Number(formData.pasos || 2),
+    fechaCreacion: formData.fechaCreacion || new Date().toISOString().slice(0, 10),
     principal: Boolean(formData.principal),
     estado: typeof formData.estado === 'boolean' ? formData.estado : true
   };
@@ -139,7 +141,7 @@ export const saveFormula = async (formData, editingId = null) => {
   const nueva = editingId ? base.map((f) => (String(f.id) === String(id) ? payload : f)) : [...base, payload];
   escribirLocal('formulas', nueva);
   try {
-    const url = editingId ? `${API_URL}/formulas/${id}` : `${API_URL}/formulas`;
+    const url = editingId ? `${API_URL}/formulas/${encodeURIComponent(id)}` : `${API_URL}/formulas`;
     await fetch(url, { method: editingId ? 'PUT' : 'POST', headers: getHeaders(true), body: JSON.stringify(payload) });
   } catch (_) {}
   return nueva;
