@@ -25,6 +25,7 @@ const GestionVendedores = () => {
   const genderOptions = [
     { value: 'masculino', label: 'Masculino' }, { value: 'femenino', label: 'Femenino' }, { value: 'otro', label: 'Otro' }
   ];
+  const roleOptions = [{ value: 'barbero', label: 'Barbero' }, { value: 'administrador', label: 'Administrador' }];
 
   useEffect(() => { getVendedores().then(setVendedores); }, []);
 
@@ -38,7 +39,7 @@ const GestionVendedores = () => {
   const handleOpenEdit = (v) => {
     setEditingId(v.id);
     setFormData({
-      ...v, usuario: v.usuario || '', password: v.password || '',
+      ...v, usuario: v.usuario || '', password: v.password || '', rol: v.rol || 'barbero',
       sexo: (v.sexo || 'masculino').toLowerCase(),
       estado: typeof v.estado === 'boolean' ? v.estado : true, fotografia: v.fotografia || ''
     });
@@ -120,7 +121,10 @@ const GestionVendedores = () => {
               <Col xs={12} sm={6}><FormSelectField id="v-sexo" label="Sexo" value={formData.sexo} options={genderOptions} icon="bi-gender-ambiguous" required onChange={(e) => setFormData({ ...formData, sexo: e.target.value })} /></Col>
               <Col xs={12} sm={6}><FormInputField id="v-edad" label="Edad" type="number" value={formData.edad} placeholder="28" icon="bi-calendar-event" required onChange={(e) => setFormData({ ...formData, edad: e.target.value })} /></Col>
             </Row>
-            <FormInputField id="v-phone" label="Teléfono" type="tel" value={formData.telefono} placeholder="+58 412 0000000" icon="bi-telephone" required onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
+            <Row className="g-2">
+              <Col xs={12} sm={6}><FormSelectField id="v-rol" label="Rol" value={formData.rol || 'barbero'} options={roleOptions} icon="bi-shield-lock" required onChange={(e) => setFormData({ ...formData, rol: e.target.value })} /></Col>
+              <Col xs={12} sm={6}><FormInputField id="v-phone" label="Teléfono" type="tel" value={formData.telefono} placeholder="+58 412 0000000" icon="bi-telephone" required onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} /></Col>
+            </Row>
             {editingId && (
               <div className="d-flex justify-content-between align-items-center p-2 px-3 mt-2 rounded border border-gold" style={{ background: '#0c0d0e' }}>
                 <span className="small fw-semibold text-white">

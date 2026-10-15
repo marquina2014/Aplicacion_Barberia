@@ -23,7 +23,7 @@
       "sexo": "femenino",
       "edad": 24,
       "telefono": "04241290567",
-      "estado": true,
+      "estado": false,
       "fotografia": ""
     },
     {
@@ -36,7 +36,7 @@
       "sexo": "masculino",
       "edad": 27,
       "telefono": "04148392015",
-      "estado": true,
+      "estado": false,
       "fotografia": ""
     },
     {
@@ -49,7 +49,7 @@
       "sexo": "masculino",
       "edad": 29,
       "telefono": "04129546182",
-      "estado": true,
+      "estado": false,
       "fotografia": ""
     }
   ],

@@ -42,7 +42,7 @@ const sbUpsert = async (tabla, item) => {
 // --- VENDEDORES ---
 export const getVendedores = async () => {
   const remotos = await sbGet('vendedores', 'id', true);
-  return remotos ? escribirLocal('vendedores', remotos) : leerLocal('vendedores');
+  return remotos && remotos.length > 0 ? escribirLocal('vendedores', remotos) : leerLocal('vendedores');
 };
 
 export const saveVendedor = async (formData, editingId = null) => {
@@ -65,7 +65,7 @@ export const saveVendedor = async (formData, editingId = null) => {
 // --- CLIENTES ---
 export const getClientes = async () => {
   const remotos = await sbGet('clientes', 'id', true);
-  return remotos ? escribirLocal('clientes', remotos) : leerLocal('clientes');
+  return remotos && remotos.length > 0 ? escribirLocal('clientes', remotos) : leerLocal('clientes');
 };
 
 export const saveCliente = async (formData, editingId = null) => {
@@ -87,7 +87,7 @@ export const createCliente = (nuevo) => saveCliente(nuevo, null);
 // --- VENTAS ---
 export const getVentas = async () => {
   const remotos = await sbGet('ventas', 'fechaISO', false);
-  return remotos ? escribirLocal('ventas', remotos) : leerLocal('ventas');
+  return remotos && remotos.length > 0 ? escribirLocal('ventas', remotos) : leerLocal('ventas');
 };
 
 export const createVenta = async (venta) => {
@@ -100,7 +100,7 @@ export const createVenta = async (venta) => {
 // --- FÓRMULAS ---
 export const getFormulas = async () => {
   const remotos = await sbGet('formulas', 'id', true);
-  return remotos ? escribirLocal('formulas', remotos) : leerLocal('formulas');
+  return remotos && remotos.length > 0 ? escribirLocal('formulas', remotos) : leerLocal('formulas');
 };
 
 export const saveFormula = async (formData, editingId = null) => {

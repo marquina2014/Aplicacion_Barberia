@@ -65,9 +65,9 @@ ALTER TABLE public.formulas DISABLE ROW LEVEL SECURITY;
 -- DATOS INICIALES: VENDEDORES
 INSERT INTO public.vendedores (id, usuario, password, email, nombres, rol, sexo, edad, telefono, estado, fotografia) VALUES
 ('1', 'Marquina2014', '123456', 'Luiseduardo15097@gmail.com', 'luis marquina', 'administrador', 'masculino', 30, '04127153847', true, ''),
-('2', 'Sofiapatas', '123456', 'Sofiamarcano1@gmail.com', 'Sofia marcano', 'barbero', 'femenino', 24, '04241290567', true, ''),
-('3', 'MatiasFade', '123456', 'matias.valderrama@legendario.com', 'Matías Valderrama', 'barbero', 'masculino', 27, '04148392015', true, ''),
-('4', 'GaelBlade', '123456', 'gael.montenegro@legendario.com', 'Gael Montenegro', 'barbero', 'masculino', 29, '04129546182', true, '')
+('2', 'Sofiapatas', '123456', 'Sofiamarcano1@gmail.com', 'Sofia marcano', 'barbero', 'femenino', 24, '04241290567', false, ''),
+('3', 'MatiasFade', '123456', 'matias.valderrama@legendario.com', 'Matías Valderrama', 'barbero', 'masculino', 27, '04148392015', false, ''),
+('4', 'GaelBlade', '123456', 'gael.montenegro@legendario.com', 'Gael Montenegro', 'barbero', 'masculino', 29, '04129546182', false, '')
 ON CONFLICT (id) DO NOTHING;
 
 -- DATOS INICIALES: CLIENTES
