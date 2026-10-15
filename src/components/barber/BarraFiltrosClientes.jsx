@@ -18,10 +18,9 @@ const BarraFiltrosClientes = ({
   onNuevoCliente
 }) => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const extraCount = [filters.estado].filter(Boolean).length;
+  const extraCount = [filters.estado !== 'activo'].filter(Boolean).length;
 
   const estadoOptions = [
-    { value: '', label: 'Buscar...' },
     { value: 'activo', label: 'Activo' },
     { value: 'inactivo', label: 'Inactivo' }
   ];
@@ -32,7 +31,7 @@ const BarraFiltrosClientes = ({
         <i className="bi bi-shield-check text-gold-accent me-1"></i>Estado
       </Form.Label>
       <DarkSelect
-        id={`${idPrefix}-estado`} value={filters.estado} placeholder="Buscar..."
+        id={`${idPrefix}-estado`} value={filters.estado || 'activo'}
         onChange={(e) => onFilterChange('estado', e.target.value)}
         options={estadoOptions}
       />

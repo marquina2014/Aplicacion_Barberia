@@ -12,7 +12,7 @@ import { getVendedores, saveVendedor } from '../services/api';
  * Propósito: Listado, filtros avanzados y control de vendedores / barberos conectado a JSON Server.
  */
 const GestionVendedores = () => {
-  const initFilters = { nombre: '', usuario: '', edad: '', telefono: '', estado: '' };
+  const initFilters = { nombre: '', usuario: '', edad: '', telefono: '', estado: 'activo' };
   const [filters, setFilters] = useState(initFilters);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -55,12 +55,12 @@ const GestionVendedores = () => {
   };
 
   const filtered = vendedores.filter((v) => {
+    const activo = typeof v.estado === 'boolean' ? v.estado : true;
     if (filters.nombre && !(v.nombres || '').toLowerCase().includes(filters.nombre.toLowerCase())) return false;
     if (filters.usuario && !(v.usuario || '').toLowerCase().includes(filters.usuario.toLowerCase())) return false;
     if (filters.edad && String(v.edad || '') !== String(filters.edad)) return false;
     if (filters.telefono && !(v.telefono || '').includes(filters.telefono)) return false;
-    if (filters.estado === 'activo' && v.estado === false) return false;
-    if (filters.estado === 'inactivo' && v.estado !== false) return false;
+    if (filters.estado === 'inactivo' ? activo : !activo) return false;
     return true;
   });
 

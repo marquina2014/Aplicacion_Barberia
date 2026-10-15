@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import DarkSelect from '../common/DarkSelect';
 import ModalFiltrosMovil from '../common/ModalFiltrosMovil';
 
 /**
  * Componente: BarraFiltrosVendedores
  * Propósito: Barra unificada de filtros para Gestión de Vendedores.
- * - En PC: 5 columnas del mismo tamaño (Nombre, Usuario, Edad, Teléfono y Acciones).
- * - En Celular: muestra 2 filtros (Nombre y Usuario) y menú modal para el resto.
+ * - En PC: 5 columnas (Nombre, Usuario, Teléfono, Estado y Acciones).
+ * - En Celular: muestra Nombre y Usuario, y menú modal para el resto.
  */
 const BarraFiltrosVendedores = ({
   filters,
@@ -17,20 +18,15 @@ const BarraFiltrosVendedores = ({
   onNuevoVendedor
 }) => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const extraCount = [filters.edad, filters.telefono].filter(Boolean).length;
+  const extraCount = [filters.telefono, filters.edad, filters.estado !== 'activo'].filter(Boolean).length;
+
+  const estadoOptions = [
+    { value: 'activo', label: 'Activo' },
+    { value: 'inactivo', label: 'Inactivo' }
+  ];
 
   const renderFiltrosExtra = (idPrefix, wrapperClass = '') => (
     <>
-      <Form.Group controlId={`${idPrefix}-edad`} className={wrapperClass}>
-        <Form.Label className="small text-secondary-custom fw-semibold">
-          <i className="bi bi-calendar-event text-gold-accent me-1"></i>Edad
-        </Form.Label>
-        <Form.Control
-          type="number" className="dark-input" placeholder="Escribir..."
-          value={filters.edad} onChange={(e) => onFilterChange('edad', e.target.value)}
-        />
-      </Form.Group>
-
       <Form.Group controlId={`${idPrefix}-telefono`} className={wrapperClass}>
         <Form.Label className="small text-secondary-custom fw-semibold">
           <i className="bi bi-telephone text-gold-accent me-1"></i>Teléfono
@@ -38,6 +34,17 @@ const BarraFiltrosVendedores = ({
         <Form.Control
           type="text" className="dark-input" placeholder="Escribir..."
           value={filters.telefono} onChange={(e) => onFilterChange('telefono', e.target.value)}
+        />
+      </Form.Group>
+
+      <Form.Group controlId={`${idPrefix}-estado`} className={wrapperClass}>
+        <Form.Label className="small text-secondary-custom fw-semibold">
+          <i className="bi bi-shield-check text-gold-accent me-1"></i>Estado
+        </Form.Label>
+        <DarkSelect
+          id={`${idPrefix}-estado`} value={filters.estado || 'activo'}
+          onChange={(e) => onFilterChange('estado', e.target.value)}
+          options={estadoOptions}
         />
       </Form.Group>
     </>
@@ -94,6 +101,15 @@ const BarraFiltrosVendedores = ({
       </div>
 
       <ModalFiltrosMovil show={showMobileFilters} onHide={() => setShowMobileFilters(false)} onReset={onReset} activeCount={extraCount}>
+        <Form.Group controlId="mov-fv-edad" className="mb-2">
+          <Form.Label className="small text-secondary-custom fw-semibold">
+            <i className="bi bi-calendar-event text-gold-accent me-1"></i>Edad
+          </Form.Label>
+          <Form.Control
+            type="number" className="dark-input" placeholder="Escribir..."
+            value={filters.edad} onChange={(e) => onFilterChange('edad', e.target.value)}
+          />
+        </Form.Group>
         {renderFiltrosExtra('mov-fv')}
       </ModalFiltrosMovil>
     </div>
