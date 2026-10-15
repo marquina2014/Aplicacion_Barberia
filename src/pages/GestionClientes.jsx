@@ -10,7 +10,7 @@ import { getClientes, saveCliente } from '../services/api';
  * Propósito: Listado, filtros unificados, edición y activación/inactivación de clientes.
  */
 const GestionClientes = () => {
-  const initFilters = { nombre: '', telefono: '', estado: '' };
+  const initFilters = { nombre: '', telefono: '', estado: 'activo' };
   const [filters, setFilters] = useState(initFilters);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -51,8 +51,7 @@ const GestionClientes = () => {
     const activo = typeof c.estado === 'boolean' ? c.estado : true;
     if (filters.nombre && !(c.nombres || '').toLowerCase().includes(filters.nombre.toLowerCase())) return false;
     if (filters.telefono && !(c.telefono || '').includes(filters.telefono)) return false;
-    if (filters.estado === 'activo' && !activo) return false;
-    if (filters.estado === 'inactivo' && activo) return false;
+    if (filters.estado === 'inactivo' ? activo : !activo) return false;
     return true;
   });
 
