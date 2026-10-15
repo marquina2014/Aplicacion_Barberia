@@ -1,18 +1,7 @@
 import seedData from '../../db.json';
-import { obtenerUsuarioActual, guardarUsuarioActual, obtenerTokenJWT } from '../utils/sesionUsuario';
+import { supabase } from './supabaseClient';
+import { obtenerUsuarioActual, guardarUsuarioActual } from '../utils/sesionUsuario';
 import { cifrarDatos, descifrarDatos } from '../utils/criptografia';
-
-/**
- * Servicio centralizado de datos conectado a JSON Server (http://localhost:4000).
- * Envía el token JWT encriptado en Authorization y cifra el respaldo en localStorage.
- */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-
-const getHeaders = (json = false) => {
-  const token = obtenerTokenJWT();
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  return json ? { ...headers, 'Content-Type': 'application/json' } : headers;
-};
 
 const leerLocal = (tabla) => {
   const base = seedData[tabla] || [];
@@ -21,9 +10,8 @@ const leerLocal = (tabla) => {
     if (raw) {
       const guardado = descifrarDatos(raw) || JSON.parse(raw);
       if (Array.isArray(guardado)) {
-        const idsGuardados = new Set(guardado.map((x) => String(x.id)));
-        const faltantes = base.filter((x) => !idsGuardados.has(String(x.id)));
-        return [...guardado, ...faltantes];
+        const ids = new Set(guardado.map((x) => String(x.id)));
+        return [...guardado, ...base.filter((x) => !ids.has(String(x.id)))];
       }
     }
   } catch (_) {}
@@ -31,99 +19,89 @@ const leerLocal = (tabla) => {
 };
 
 const escribirLocal = (tabla, lista) => {
-  try {
-    localStorage.setItem(`legendario_db_v3_${tabla}`, cifrarDatos(lista));
-  } catch (_) {}
+  try { localStorage.setItem(`legendario_db_v3_${tabla}`, cifrarDatos(lista)); } catch (_) {}
   return lista;
 };
 
-const fetchTabla = async (tabla) => {
+const sbGet = async (tabla, order = 'id', asc = true) => {
+  if (!supabase) return null;
   try {
-    const res = await fetch(`${API_URL}/${tabla}`, { headers: getHeaders() });
-    if (!res.ok) throw new Error('Error HTTP');
-    const data = await res.json();
-    return escribirLocal(tabla, data);
-  } catch (_) {
-    return leerLocal(tabla);
-  }
+    const { data, error } = await supabase.from(tabla).select('*').order(order, { ascending: asc });
+    return !error && data ? data : null;
+  } catch (_) { return null; }
+};
+
+const sbUpsert = async (tabla, item) => {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.from(tabla).upsert(item).select().single();
+    return !error && data ? data : null;
+  } catch (_) { return null; }
 };
 
 // --- VENDEDORES ---
-export const getVendedores = () => fetchTabla('vendedores');
+export const getVendedores = async () => {
+  const remotos = await sbGet('vendedores', 'id', true);
+  return remotos ? escribirLocal('vendedores', remotos) : leerLocal('vendedores');
+};
 
 export const saveVendedor = async (formData, editingId = null) => {
   const actual = obtenerUsuarioActual();
   const payload = {
-    ...formData,
-    edad: Number(formData.edad) || 0,
+    ...formData, edad: Number(formData.edad) || 0,
     rol: formData.rol || (String(editingId) === '1' ? 'administrador' : 'barbero'),
     estado: typeof formData.estado === 'boolean' ? formData.estado : true,
     fotografia: formData.fotografia || ''
   };
-  try {
-    const url = editingId ? `${API_URL}/vendedores/${editingId}` : `${API_URL}/vendedores`;
-    const method = editingId ? 'PUT' : 'POST';
-    const body = editingId ? { id: String(editingId), ...payload } : { id: String(Date.now()), ...payload };
-    const res = await fetch(url, { method, headers: getHeaders(true), body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('Error HTTP');
-    const saved = await res.json();
-    if (String(saved.id) === String(actual.id)) guardarUsuarioActual(saved);
-    return saved;
-  } catch (_) {
-    const lista = leerLocal('vendedores');
-    const item = editingId ? { ...payload, id: String(editingId) } : { ...payload, id: String(Date.now()) };
-    const nueva = editingId ? lista.map((v) => (String(v.id) === String(editingId) ? item : v)) : [...lista, item];
-    escribirLocal('vendedores', nueva);
-    if (String(item.id) === String(actual.id)) guardarUsuarioActual(item);
-    return item;
-  }
+  const item = { ...payload, id: String(editingId || Date.now()) };
+  const guardado = await sbUpsert('vendedores', item);
+  const lista = leerLocal('vendedores');
+  const nueva = editingId ? lista.map((v) => (String(v.id) === String(editingId) ? (guardado || item) : v)) : [...lista, (guardado || item)];
+  escribirLocal('vendedores', nueva);
+  if (String(item.id) === String(actual.id)) guardarUsuarioActual(guardado || item);
+  return guardado || item;
 };
 
 // --- CLIENTES ---
-export const getClientes = () => fetchTabla('clientes');
+export const getClientes = async () => {
+  const remotos = await sbGet('clientes', 'id', true);
+  return remotos ? escribirLocal('clientes', remotos) : leerLocal('clientes');
+};
 
 export const saveCliente = async (formData, editingId = null) => {
   const payload = {
-    ...formData,
-    visitas: formData.visitas ?? 1,
+    ...formData, visitas: formData.visitas ?? 1,
     ultimo: formData.ultimo || 'Nuevo Registro',
     estado: typeof formData.estado === 'boolean' ? formData.estado : true
   };
-  try {
-    const url = editingId ? `${API_URL}/clientes/${editingId}` : `${API_URL}/clientes`;
-    const method = editingId ? 'PUT' : 'POST';
-    const body = editingId ? { id: String(editingId), ...payload } : { id: String(Date.now()), ...payload };
-    const res = await fetch(url, { method, headers: getHeaders(true), body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('Error HTTP');
-    return await res.json();
-  } catch (_) {
-    const lista = leerLocal('clientes');
-    const item = editingId ? { ...payload, id: String(editingId) } : { ...payload, id: String(Date.now()) };
-    const nueva = editingId ? lista.map((c) => (String(c.id) === String(editingId) ? item : c)) : [item, ...lista];
-    escribirLocal('clientes', nueva);
-    return item;
-  }
+  const item = { ...payload, id: String(editingId || Date.now()) };
+  const guardado = await sbUpsert('clientes', item);
+  const lista = leerLocal('clientes');
+  const nueva = editingId ? lista.map((c) => (String(c.id) === String(editingId) ? (guardado || item) : c)) : [guardado || item, ...lista];
+  escribirLocal('clientes', nueva);
+  return guardado || item;
 };
 
 export const createCliente = (nuevo) => saveCliente(nuevo, null);
 
 // --- VENTAS ---
-export const getVentas = () => fetchTabla('ventas');
+export const getVentas = async () => {
+  const remotos = await sbGet('ventas', 'fechaISO', false);
+  return remotos ? escribirLocal('ventas', remotos) : leerLocal('ventas');
+};
 
 export const createVenta = async (venta) => {
-  try {
-    const res = await fetch(`${API_URL}/ventas`, { method: 'POST', headers: getHeaders(true), body: JSON.stringify(venta) });
-    if (!res.ok) throw new Error('Error HTTP');
-    return await res.json();
-  } catch (_) {
-    const lista = [venta, ...leerLocal('ventas')];
-    escribirLocal('ventas', lista);
-    return venta;
-  }
+  const guardado = await sbUpsert('ventas', venta);
+  const lista = [guardado || venta, ...leerLocal('ventas')];
+  escribirLocal('ventas', lista);
+  return guardado || venta;
 };
 
 // --- FÓRMULAS ---
-export const getFormulas = () => fetchTabla('formulas');
+export const getFormulas = async () => {
+  const remotos = await sbGet('formulas', 'id', true);
+  return remotos ? escribirLocal('formulas', remotos) : leerLocal('formulas');
+};
 
 export const saveFormula = async (formData, editingId = null) => {
   const listaActual = leerLocal('formulas');
@@ -137,12 +115,12 @@ export const saveFormula = async (formData, editingId = null) => {
     principal: Boolean(formData.principal),
     estado: typeof formData.estado === 'boolean' ? formData.estado : true
   };
+  if (supabase && payload.principal) {
+    try { await supabase.from('formulas').update({ principal: false }).neq('id', id); } catch (_) {}
+  }
+  await sbUpsert('formulas', payload);
   const base = payload.principal ? listaActual.map((f) => ({ ...f, principal: false })) : listaActual;
   const nueva = editingId ? base.map((f) => (String(f.id) === String(id) ? payload : f)) : [...base, payload];
   escribirLocal('formulas', nueva);
-  try {
-    const url = editingId ? `${API_URL}/formulas/${encodeURIComponent(id)}` : `${API_URL}/formulas`;
-    await fetch(url, { method: editingId ? 'PUT' : 'POST', headers: getHeaders(true), body: JSON.stringify(payload) });
-  } catch (_) {}
   return nueva;
 };
