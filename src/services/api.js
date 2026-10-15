@@ -35,6 +35,11 @@ const sbUpsert = async (tabla, item) => {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from(tabla).upsert(item).select().single();
+    if (error && tabla === 'ventas' && error.message?.includes('referenciaPago')) {
+      const { referenciaPago, ...sinRef } = item;
+      const res = await supabase.from(tabla).upsert(sinRef).select().single();
+      return !res.error && res.data ? { ...res.data, referenciaPago } : null;
+    }
     return !error && data ? data : null;
   } catch (_) { return null; }
 };
@@ -83,6 +88,19 @@ export const saveCliente = async (formData, editingId = null) => {
 };
 
 export const createCliente = (nuevo) => saveCliente(nuevo, null);
+
+export const syncClienteDesdeVenta = async (nombre, telefono = '', servicio = '') => {
+  if (!nombre?.trim()) return null;
+  const nombreNorm = nombre.trim().toLowerCase();
+  const existente = (await getClientes()).find((c) => (c.nombres || '').trim().toLowerCase() === nombreNorm);
+  if (existente) {
+    return saveCliente({
+      ...existente, visitas: (Number(existente.visitas) || 1) + 1,
+      ultimo: servicio || existente.ultimo, telefono: telefono?.trim() || existente.telefono || ''
+    }, existente.id);
+  }
+  return createCliente({ nombres: nombre.trim(), telefono: telefono?.trim() || '', visitas: 1, ultimo: servicio || 'Corte Clásico', estado: true });
+};
 
 // --- VENTAS ---
 export const getVentas = async () => {

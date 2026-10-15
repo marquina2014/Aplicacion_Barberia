@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS public.ventas (
   "formulaAplicada" TEXT DEFAULT 'Fórmula Inicial',
   monto NUMERIC(10,2) NOT NULL,
   "montoFinal" NUMERIC(10,2) NOT NULL,
-  pago TEXT NOT NULL
+  pago TEXT NOT NULL,
+  "referenciaPago" TEXT DEFAULT ''
 );
 
 -- 4. TABLA: FÓRMULAS

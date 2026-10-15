@@ -69,9 +69,9 @@ const celdaTexto = (ref, texto, style = 4) => `<c r="${ref}" s="${style}" t="inl
 const celdaNumero = (ref, num, style = 2) => `<c r="${ref}" s="${style}" t="n"><v>${Number(num || 0)}</v></c>`;
 
 export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario', formula = FORMULA_INICIAL) => {
-  const colsTexto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero', 'Cliente', 'Servicio Realizado', 'Fórmula Aplicada', 'Método de Pago', 'Monto Original ($)', 'Monto Final ($)'];
-  const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const colsTexto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero', 'Cliente', 'Servicio Realizado', 'Fórmula Aplicada', 'Método de Pago', 'Referencia Método de Pago', 'Monto Original ($)', 'Monto Final ($)'];
+  const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
   let filasXml = `<row r="1" ht="24" customHeight="1">${headers.map((h, i) => celdaTexto(`${letras[i]}1`, h, 1)).join('')}</row>`;
   let totalOriginal = 0;
@@ -89,13 +89,14 @@ export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario
       celdaTexto(`C${r}`, v.fechaHora || '') + celdaTexto(`D${r}`, v.vendedor || '') +
       celdaTexto(`E${r}`, v.cliente || '') + celdaTexto(`F${r}`, v.servicio || '') +
       celdaTexto(`G${r}`, nombreFormula) + celdaTexto(`H${r}`, v.pago || '') +
-      celdaNumero(`I${r}`, montoOrig, 2) + celdaNumero(`J${r}`, montoFin, 2) + `</row>`;
+      celdaTexto(`I${r}`, v.referenciaPago || '') +
+      celdaNumero(`J${r}`, montoOrig, 2) + celdaNumero(`K${r}`, montoFin, 2) + `</row>`;
   });
 
   const filaTotal = ventas.length + 2;
   filasXml += `<row r="${filaTotal}" ht="22" customHeight="1">` +
-    colsTexto.map((c, i) => celdaTexto(`${c}${filaTotal}`, i === 7 ? 'TOTAL FACTURADO' : '', 1)).join('') +
-    celdaNumero(`I${filaTotal}`, totalOriginal, 3) + celdaNumero(`J${filaTotal}`, totalFinal, 3) + `</row>`;
+    colsTexto.map((c, i) => celdaTexto(`${c}${filaTotal}`, i === 8 ? 'TOTAL FACTURADO' : '', 1)).join('') +
+    celdaNumero(`J${filaTotal}`, totalOriginal, 3) + celdaNumero(`K${filaTotal}`, totalFinal, 3) + `</row>`;
 
   const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -104,7 +105,8 @@ export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario
     <col min="3" max="3" width="18" customWidth="1"/><col min="4" max="4" width="24" customWidth="1"/>
     <col min="5" max="5" width="24" customWidth="1"/><col min="6" max="6" width="26" customWidth="1"/>
     <col min="7" max="7" width="24" customWidth="1"/><col min="8" max="8" width="18" customWidth="1"/>
-    <col min="9" max="9" width="20" customWidth="1"/><col min="10" max="10" width="20" customWidth="1"/>
+    <col min="9" max="9" width="28" customWidth="1"/><col min="10" max="10" width="20" customWidth="1"/>
+    <col min="11" max="11" width="20" customWidth="1"/>
   </cols>
   <sheetData>${filasXml}</sheetData>
 </worksheet>`;
@@ -143,6 +145,5 @@ export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = `${nombreBase}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 };
