@@ -31,7 +31,7 @@ const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
             <tr>
               <th>ID</th>
               <th>Fecha y Hora</th>
-              <th>Vendedor</th>
+              <th>Barbero</th>
               <th>Cliente</th>
               <th>Servicio</th>
               <th>Fórmula Aplicada</th>

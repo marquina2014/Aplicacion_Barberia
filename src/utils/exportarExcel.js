@@ -70,7 +70,7 @@ const celdaNumero = (ref, num, style = 2) => `<c r="${ref}" s="${style}" t="n"><
 
 export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario', formula = FORMULA_INICIAL) => {
   const colsTexto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero (Vendedor)', 'Cliente', 'Servicio Realizado', 'Fórmula Aplicada', 'Método de Pago', 'Monto Original ($)', 'Monto Final ($)'];
+  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero', 'Cliente', 'Servicio Realizado', 'Fórmula Aplicada', 'Método de Pago', 'Monto Original ($)', 'Monto Final ($)'];
   const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
   let filasXml = `<row r="1" ht="24" customHeight="1">${headers.map((h, i) => celdaTexto(`${letras[i]}1`, h, 1)).join('')}</row>`;

@@ -58,7 +58,7 @@ const BarraFiltrosVendedores = ({
           onClick={onNuevoVendedor}
         >
           <i className="bi bi-person-plus-fill"></i>
-          <span>Nuevo Vendedor</span>
+          <span>Nuevo Barbero</span>
         </Button>
       </div>
 

@@ -101,7 +101,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
         <Modal.Body className="p-4">
           <Row className="g-2">
             <Col xs={12} sm={6}>
-              <FormSelectField id="mv-vendedor" label="Barbero (Vendedor)" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required />
+              <FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required />
             </Col>
             <Col xs={12} sm={6}>
               <FormInputField id="mv-cliente" label="Nombre del Cliente" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="" icon="bi-person" required />

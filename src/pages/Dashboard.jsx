@@ -16,7 +16,7 @@ const Dashboard = () => {
 
   const metrics = [
     { title: 'Ventas de Hoy', value: '$65.00', icon: 'bi-cash-stack', detail: 'Jornada activa (4 servicios)' },
-    { title: 'Vendedores Activos', value: '4 Barberos', icon: 'bi-scissors', detail: 'Turno completo' },
+    { title: 'Barberos Activos', value: '1 Barbero', icon: 'bi-scissors', detail: 'Turno activo' },
     { title: 'Clientes Registrados', value: '13 Clientes', icon: 'bi-people-fill', detail: 'Directorio activo' },
     { title: 'Ticket Promedio', value: '$16.25', icon: 'bi-graph-up-arrow', detail: 'Promedio del día' }
   ];
@@ -72,10 +72,10 @@ const Dashboard = () => {
             <Col xs={12} md={4}>
               <Card className="dark-card p-4 text-center h-100">
                 <i className="bi bi-scissors fs-1 text-gold-accent mb-2"></i>
-                <h5 className="fw-bold text-white">Gestión de Vendedores</h5>
+                <h5 className="fw-bold text-white">Gestión de Barberos</h5>
                 <p className="text-secondary-custom small mb-3">Administra los barberos, crea nuevos o edita sus datos.</p>
                 <Link to="/vendedores" className="btn btn-outline-gold mt-auto">
-                  Ver Vendedores
+                  Ver Barberos
                 </Link>
               </Card>
             </Col>

@@ -83,7 +83,7 @@ const BarraFiltrosVentas = ({
       <div className="dark-card p-3 mb-3">
         <div className="filters-grid-row">
           <Form.Group controlId="filtro-vendedor">
-            <Form.Label className="small text-secondary-custom fw-semibold"><i className="bi bi-scissors text-gold-accent me-1"></i>Vendedor</Form.Label>
+            <Form.Label className="small text-secondary-custom fw-semibold"><i className="bi bi-scissors text-gold-accent me-1"></i>Barbero</Form.Label>
             <DarkSelect id="filtro-vendedor" value={filters.vendedor} disabled={vendedorDisabled} placeholder="Buscar..." onChange={(e) => onFilterChange('vendedor', e.target.value)} options={[{ value: '', label: 'Buscar...' }, ...vendedores.map((v) => ({ value: v, label: v }))]} />
           </Form.Group>
           <Form.Group controlId="filtro-cliente">

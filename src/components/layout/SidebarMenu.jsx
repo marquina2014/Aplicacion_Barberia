@@ -23,7 +23,7 @@ const SidebarMenu = ({ onNavigate, isMobile = false }) => {
 
   const allItems = [
     { to: '/dashboard', label: 'Inicio', icon: 'bi-grid-fill', adminOnly: false },
-    { to: '/vendedores', label: 'Gestión Vendedores', icon: 'bi-scissors', adminOnly: true },
+    { to: '/vendedores', label: 'Gestión Barberos', icon: 'bi-scissors', adminOnly: true },
     { to: '/clientes', label: 'Gestión Clientes', icon: 'bi-people-fill', adminOnly: true },
     { to: '/formulas', label: 'Fórmulas', icon: 'bi-calculator-fill', adminOnly: true },
     { to: '/ventas-dia', label: 'Ventas del Día', icon: 'bi-calendar2-day-fill', adminOnly: false },

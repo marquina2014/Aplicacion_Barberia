@@ -65,7 +65,7 @@ const GestionVendedores = () => {
   });
 
   return (
-    <MainLayout title="Gestión de Vendedores" subtitle="Administración de barberos y comisionistas">
+    <MainLayout title="Gestión de Barberos" subtitle="Administración de barberos del equipo">
       <BarraFiltrosVendedores
         filters={filters} onFilterChange={(field, val) => setFilters((prev) => ({ ...prev, [field]: val }))}
         onReset={() => setFilters(initFilters)} onRefresh={handleRefresh}
@@ -106,7 +106,7 @@ const GestionVendedores = () => {
       <Modal show={showModal} onHide={() => setShowModal(false)} centered contentClassName="dark-card">
         <Modal.Header closeButton closeVariant="white" className="border-gold">
           <Modal.Title className="text-white fw-bold fs-5">
-            <i className="bi bi-person-badge text-gold-accent me-2"></i>{editingId ? 'Editar Vendedor' : 'Registrar Vendedor'}
+            <i className="bi bi-person-badge text-gold-accent me-2"></i>{editingId ? 'Editar Barbero' : 'Registrar Barbero'}
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSave}>
@@ -129,7 +129,7 @@ const GestionVendedores = () => {
               <div className="d-flex justify-content-between align-items-center p-2 px-3 mt-2 rounded border border-gold" style={{ background: '#0c0d0e' }}>
                 <span className="small fw-semibold text-white">
                   <i className={`bi ${formData.estado ? 'bi-check-circle-fill text-gold-accent' : 'bi-slash-circle text-danger'} me-2`}></i>
-                  Estado del vendedor: <span className={formData.estado ? 'text-gold-accent' : 'text-danger'}>{formData.estado ? 'Activo' : 'Inactivo'}</span>
+                  Estado del barbero: <span className={formData.estado ? 'text-gold-accent' : 'text-danger'}>{formData.estado ? 'Activo' : 'Inactivo'}</span>
                 </span>
                 <Form.Check type="switch" id="v-estado-switch" className="dark-check m-0 fs-5" checked={Boolean(formData.estado)} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} />
               </div>
@@ -137,7 +137,7 @@ const GestionVendedores = () => {
           </Modal.Body>
           <Modal.Footer className="border-gold">
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-            <Button type="submit" className="btn-primary-gradient px-4">{editingId ? 'Guardar Cambios' : 'Guardar Vendedor'}</Button>
+            <Button type="submit" className="btn-primary-gradient px-4">{editingId ? 'Guardar Cambios' : 'Guardar Barbero'}</Button>
           </Modal.Footer>
         </Form>
       </Modal>
