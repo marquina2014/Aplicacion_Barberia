@@ -20,18 +20,21 @@ const METODOS = [
   { value: 'Zelle', label: 'Zelle' }
 ];
 
+const normCed = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
 const ModalNuevaVenta = ({ show, onHide, onSave }) => {
   const usuario = obtenerUsuarioActual();
   const esAdmin = esAdministrador(usuario);
   const initForm = {
     vendedor: usuario?.nombre || '',
-    cliente: '', cedula: '', telefono: '', servicio: 'Corte Clásico', monto: '15.00',
+    cedula: '', cliente: '', telefono: '', servicio: 'Corte Clásico', monto: '15.00',
     metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
   };
   const [form, setForm] = useState(initForm);
   const [vendedores, setVendedores] = useState([]);
   const [formulas, setFormulas] = useState([FORMULA_INICIAL]);
   const [clientes, setClientes] = useState([]);
+  const [clienteEncontrado, setClienteEncontrado] = useState(null);
 
   useEffect(() => {
     if (!show) return;
@@ -45,12 +48,20 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       const fActiva = obtenerFormulaActiva(activas.length ? activas : [FORMULA_INICIAL]);
       setForm((p) => ({ ...p, vendedor: esAdmin ? (p.vendedor || activos?.[0]?.nombres || actual.nombre) : actual.nombre, formulaId: fActiva.id }));
     });
+    setClienteEncontrado(null);
   }, [show]);
 
-  const posibleDuplicado = (form.cliente.trim().length >= 3 || form.cedula.trim().length >= 4) && clientes.find((c) =>
-    (form.cedula.trim() && (c.cedula || '').trim().toLowerCase() === form.cedula.trim().toLowerCase()) ||
-    (c.nombres || '').toLowerCase().includes(form.cliente.trim().toLowerCase()) && (c.nombres || '').toLowerCase() !== form.cliente.trim().toLowerCase()
-  );
+  const handleCedulaChange = (e) => {
+    const val = e.target.value;
+    const match = val.trim().length >= 4 && clientes.find((c) => normCed(c.cedula) === normCed(val));
+    setClienteEncontrado(match || null);
+    setForm((p) => ({
+      ...p,
+      cedula: val,
+      cliente: match ? match.nombres : p.cliente,
+      telefono: match ? (match.telefono || '') : p.telefono
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,6 +84,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       referenciaPago: form.referenciaPago.trim()
     });
     setForm(initForm);
+    setClienteEncontrado(null);
     onHide();
   };
 
@@ -88,28 +100,20 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
               <FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required />
             </Col>
             <Col xs={12} md={6}>
-              <FormInputField id="mv-cliente" label="Nombre y Apellido del Cliente" value={form.cliente} list="lista-clientes-sugeridos" onChange={(e) => {
-                const val = e.target.value;
-                const match = clientes.find((c) => (c.nombres || '').toLowerCase() === val.trim().toLowerCase());
-                setForm((p) => ({ ...p, cliente: val, cedula: match?.cedula || p.cedula, telefono: match?.telefono || p.telefono }));
-              }} placeholder="Ej: Carlos Mendoza" icon="bi-person" required />
-              <datalist id="lista-clientes-sugeridos">{clientes.map((c) => <option key={c.id} value={c.nombres}>{c.cedula ? `C.I: ${c.cedula} • ` : ''}{c.telefono ? `Telf: ${c.telefono}` : ''}</option>)}</datalist>
+              <FormInputField id="mv-cedula" label="Cédula del Cliente (Buscar / Registrar)" value={form.cedula} list="lista-cedulas-registradas" onChange={handleCedulaChange} placeholder="Ej: V-28123456" icon="bi-card-text" />
+              <datalist id="lista-cedulas-registradas">{clientes.filter((c) => c.cedula).map((c) => <option key={c.id} value={c.cedula}>{c.nombres}</option>)}</datalist>
             </Col>
             <Col xs={12} md={6}>
-              <FormInputField id="mv-cedula" label="Cédula de Identidad" value={form.cedula} onChange={(e) => {
-                const cVal = e.target.value;
-                const match = clientes.find((c) => (c.cedula || '').trim().toLowerCase() === cVal.trim().toLowerCase());
-                setForm((p) => ({ ...p, cedula: cVal, cliente: match?.nombres || p.cliente, telefono: match?.telefono || p.telefono }));
-              }} placeholder="Ej: V-28123456" icon="bi-card-text" />
+              <FormInputField id="mv-cliente" label="Nombre y Apellido del Cliente" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Ej: Carlos Mendoza" icon="bi-person" required />
             </Col>
             <Col xs={12} md={6}>
               <FormInputField id="mv-tel-cliente" label="Teléfono de Contacto" type="tel" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} placeholder="+58 412 0000000" icon="bi-telephone" />
             </Col>
-            {posibleDuplicado && (
+            {clienteEncontrado && (
               <Col xs={12}>
-                <div className="alert alert-warning py-2 px-3 m-0 small border-gold d-flex align-items-center justify-content-between rounded" style={{ background: '#201804', color: '#ffda73' }}>
-                  <span><i className="bi bi-exclamation-triangle-fill me-2 text-gold-accent"></i>¿Cliente existente? <strong>{posibleDuplicado.nombres}</strong> {posibleDuplicado.cedula ? `(C.I: ${posibleDuplicado.cedula})` : ''} {posibleDuplicado.telefono ? `(${posibleDuplicado.telefono})` : ''}</span>
-                  <button type="button" className="btn btn-sm btn-link text-gold-accent p-0 fw-bold text-decoration-none" onClick={() => setForm((p) => ({ ...p, cliente: posibleDuplicado.nombres, cedula: posibleDuplicado.cedula || p.cedula, telefono: posibleDuplicado.telefono || p.telefono }))}>Usar Datos</button>
+                <div className="alert alert-success py-2 px-3 m-0 small border-gold d-flex align-items-center justify-content-between rounded" style={{ background: '#0f2415', color: '#75e69e', borderColor: '#2b8a3e' }}>
+                  <span><i className="bi bi-check-circle-fill me-2"></i>Cliente encontrado: <strong>{clienteEncontrado.nombres}</strong> ({clienteEncontrado.visitas || 1} visitas registradas)</span>
+                  <span className="badge-pill-custom">Datos cargados</span>
                 </div>
               </Col>
             )}
