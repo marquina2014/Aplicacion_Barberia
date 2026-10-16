@@ -3,13 +3,13 @@ import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/layout/AuthLayout';
 import FormInputField from '../components/common/FormInputField';
-import { getVendedores } from '../services/api';
+import { loginUsuario } from '../services/api';
 import { guardarUsuarioActual } from '../utils/sesionUsuario';
 
 /**
  * Vista: Login
  * Propósito: Pantalla de inicio de sesión de Legendario Barber Shop.
- * Autentica por Nombre de Usuario (o correo) y Contraseña contra JSON Server.
+ * Autentica de forma segura sin exponer listas de usuarios ni contraseñas.
  */
 const Login = () => {
   const navigate = useNavigate();
@@ -26,12 +26,8 @@ const Login = () => {
 
   const validateForm = () => {
     const errs = {};
-    if (!formData.usuario.trim()) {
-      errs.usuario = 'Introduce tu nombre de usuario';
-    }
-    if (!formData.password) {
-      errs.password = 'Introduce tu contraseña';
-    }
+    if (!formData.usuario.trim()) errs.usuario = 'Introduce tu nombre de usuario';
+    if (!formData.password) errs.password = 'Introduce tu contraseña';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -41,26 +37,14 @@ const Login = () => {
     if (!validateForm()) return;
     setIsSubmitting(true);
 
-    const lista = await getVendedores();
-    const userKey = formData.usuario.trim().toLowerCase();
-    const encontrado = lista.find(
-      (v) =>
-        (v.usuario || '').toLowerCase() === userKey ||
-        (v.email || '').toLowerCase() === userKey
-    );
-
-    if (!encontrado || (encontrado.password && String(encontrado.password) !== String(formData.password))) {
-      setErrors({ password: 'Usuario o contraseña incorrectos' });
-      setIsSubmitting(false);
-      return;
-    }
-    if (encontrado.estado === false) {
-      setErrors({ usuario: 'Este usuario se encuentra inactivo' });
+    const res = await loginUsuario(formData.usuario, formData.password);
+    if (!res.ok) {
+      setErrors({ password: res.error || 'Usuario o contraseña incorrectos' });
       setIsSubmitting(false);
       return;
     }
 
-    guardarUsuarioActual(encontrado);
+    guardarUsuarioActual(res.usuario);
     setIsSubmitting(false);
     navigate('/dashboard', { replace: true });
   };

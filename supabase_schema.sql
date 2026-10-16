@@ -92,3 +92,19 @@ INSERT INTO public.formulas (id, nombre, descripcion, tipo, "porcentajeCorte", "
 ('#F-01', 'Fórmula Inicial', '18% del corte, menos la mitad', 'descuento_y_mitad', 18, 50, 2, '2026-10-12', true, true)
 ON CONFLICT (id) DO NOTHING;
 
+-- 7. FUNCIÓN RPC: AUTENTICACIÓN SEGURA (NO EXPONE CONTRASEÑAS NI OTROS USUARIOS EN DEVTOOLS)
+CREATE OR REPLACE FUNCTION public.autenticar_barbero(p_identificador TEXT, p_password TEXT)
+RETURNS TABLE(id TEXT, usuario TEXT, email TEXT, nombres TEXT, rol TEXT, sexo TEXT, edad INT, telefono TEXT, estado BOOLEAN, fotografia TEXT) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT v.id, v.usuario, v.email, v.nombres, v.rol, v.sexo, v.edad, v.telefono, v.estado, v.fotografia
+  FROM public.vendedores v
+  WHERE (LOWER(v.usuario) = LOWER(TRIM(p_identificador)) OR LOWER(v.email) = LOWER(TRIM(p_identificador)))
+    AND v.password = p_password
+  LIMIT 1;
+END;
+$$;
+

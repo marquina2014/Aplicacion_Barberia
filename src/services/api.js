@@ -23,10 +23,10 @@ export const escribirLocal = (tabla, lista) => {
   return lista;
 };
 
-export const sbGet = async (tabla, order = 'id', asc = true) => {
+export const sbGet = async (tabla, order = 'id', asc = true, select = '*') => {
   if (!supabase) return null;
   try {
-    const { data, error } = await supabase.from(tabla).select('*').order(order, { ascending: asc });
+    const { data, error } = await supabase.from(tabla).select(select).order(order, { ascending: asc });
     return !error && data ? data : null;
   } catch (_) { return null; }
 };
@@ -51,10 +51,14 @@ export const sbUpsert = async (tabla, item) => {
   } catch (_) { return null; }
 };
 
-// --- VENDEDORES ---
+import { COLS_PUBLICAS_VENDEDORES, loginUsuario } from './authApi';
+export { loginUsuario };
+
+// --- VENDEDORES (LISTADO SIN CONTRASEÑAS) ---
 export const getVendedores = async () => {
-  const remotos = await sbGet('vendedores', 'id', true);
-  return remotos ? escribirLocal('vendedores', remotos) : leerLocal('vendedores');
+  const remotos = await sbGet('vendedores', 'id', true, COLS_PUBLICAS_VENDEDORES);
+  const sanitizar = (l) => (l || []).map(({ password, ...v }) => v);
+  return remotos ? escribirLocal('vendedores', sanitizar(remotos)) : sanitizar(leerLocal('vendedores'));
 };
 
 export const saveVendedor = async (formData, editingId = null) => {
@@ -65,6 +69,7 @@ export const saveVendedor = async (formData, editingId = null) => {
     estado: typeof formData.estado === 'boolean' ? formData.estado : true,
     fotografia: formData.fotografia || ''
   };
+  if (editingId && !payload.password) delete payload.password;
   const item = { ...payload, id: String(editingId || Date.now()) };
   const guardado = await sbUpsert('vendedores', item);
   const lista = leerLocal('vendedores');
@@ -120,9 +125,5 @@ export const createVenta = async (venta) => {
   return guardado || venta;
 };
 
-// --- RE-EXPORTACIÓN DE DIMENSIONES (FÓRMULAS, SERVICIOS, MÉTODOS DE PAGO) ---
-export {
-  getFormulas, saveFormula,
-  getServicios, saveServicio,
-  getMetodosPago, saveMetodoPago
-} from './dimensionesApi';
+// --- RE-EXPORTACIÓN DE DIMENSIONES ---
+export { getFormulas, saveFormula, getServicios, saveServicio, getMetodosPago, saveMetodoPago } from './dimensionesApi';
