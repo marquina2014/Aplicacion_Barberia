@@ -29,5 +29,18 @@
       "principal": true,
       "estado": true
     }
+  ],
+  "servicios": [
+    { "id": "srv-1", "nombre": "Corte Clásico", "precio": 15, "estado": true },
+    { "id": "srv-2", "nombre": "Perfilado de Barba", "precio": 10, "estado": true },
+    { "id": "srv-3", "nombre": "Combo Legendario", "precio": 22, "estado": true },
+    { "id": "srv-4", "nombre": "Tratamiento Capilar", "precio": 18, "estado": true }
+  ],
+  "metodosPago": [
+    { "id": "mp-1", "nombre": "Efectivo", "moneda": "Dólares", "estado": true },
+    { "id": "mp-2", "nombre": "Zelle", "moneda": "Dólares", "estado": true },
+    { "id": "mp-3", "nombre": "Pago Móvil", "moneda": "Bolívares", "estado": true },
+    { "id": "mp-4", "nombre": "Punto de Venta / Tarjeta", "moneda": "Bolívares", "estado": true },
+    { "id": "mp-5", "nombre": "Efectivo Bs", "moneda": "Bolívares", "estado": true }
   ]
 }

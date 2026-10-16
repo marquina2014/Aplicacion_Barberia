@@ -3,18 +3,20 @@ import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
 import { getLocalDateISO } from '../../utils/dateUtils';
-import { getVendedores, getFormulas, getClientes, syncClienteDesdeVenta } from '../../services/api';
+import { getVendedores, getFormulas, getClientes, getServicios, getMetodosPago, syncClienteDesdeVenta } from '../../services/api';
 import { obtenerUsuarioActual, esAdministrador } from '../../utils/sesionUsuario';
 import { FORMULA_INICIAL, obtenerFormulaActiva, calcularMontoFinal } from '../../utils/formulasUtils';
 
-const SERVICIOS = [
-  { value: 'Corte Clásico', label: 'Corte Clásico ($15)' },
-  { value: 'Perfilado de Barba', label: 'Perfilado de Barba ($10)' },
-  { value: 'Combo Legendario', label: 'Combo Legendario ($22)' },
-  { value: 'Tratamiento Capilar', label: 'Tratamiento Capilar ($18)' }
+const SERVICIOS_BASE = [
+  { value: 'Corte Clásico', label: 'Corte Clásico ($15)', precio: 15 }, { value: 'Perfilado de Barba', label: 'Perfilado de Barba ($10)', precio: 10 },
+  { value: 'Combo Legendario', label: 'Combo Legendario ($22)', precio: 22 }, { value: 'Tratamiento Capilar', label: 'Tratamiento Capilar ($18)', precio: 18 }
 ];
 const MONEDAS = [{ value: 'Dólares', label: 'Dólares ($)' }, { value: 'Bolívares', label: 'Bolívares (Bs)' }];
-const METODOS = [{ value: 'Efectivo', label: 'Efectivo' }, { value: 'Pago Móvil', label: 'Pago Móvil' }, { value: 'Tarjeta', label: 'Punto de Venta / Tarjeta' }, { value: 'Zelle', label: 'Zelle' }];
+const METODOS_BASE = [
+  { value: 'Efectivo', label: 'Efectivo', moneda: 'Dólares' }, { value: 'Zelle', label: 'Zelle', moneda: 'Dólares' },
+  { value: 'Pago Móvil', label: 'Pago Móvil', moneda: 'Bolívares' }, { value: 'Punto de Venta / Tarjeta', label: 'Punto de Venta / Tarjeta', moneda: 'Bolívares' },
+  { value: 'Efectivo Bs', label: 'Efectivo Bs', moneda: 'Bolívares' }
+];
 const normCed = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
 const ModalNuevaVenta = ({ show, onHide, onSave }) => {
@@ -29,22 +31,41 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
   const [vendedores, setVendedores] = useState([]);
   const [formulas, setFormulas] = useState([FORMULA_INICIAL]);
   const [clientes, setClientes] = useState([]);
+  const [servicios, setServicios] = useState(SERVICIOS_BASE);
+  const [todosMetodos, setTodosMetodos] = useState(METODOS_BASE);
   const [clienteEncontrado, setClienteEncontrado] = useState(null);
 
   useEffect(() => {
     if (!show) return;
     const actual = obtenerUsuarioActual();
-    Promise.all([getVendedores(), getFormulas(), getClientes()]).then(([vends, forms, clis]) => {
-      const activos = (vends || []).filter((v) => v.estado !== false);
-      if (activos.length) setVendedores(activos.map((v) => ({ value: v.nombres, label: v.nombres })));
-      const activas = (forms || []).filter((f) => Boolean(f.estado));
-      setFormulas(activas.length ? activas : [FORMULA_INICIAL]);
+    Promise.all([getVendedores(), getFormulas(), getClientes(), getServicios(), getMetodosPago()]).then(([vends, forms, clis, servs, mets]) => {
+      const activosV = (vends || []).filter((v) => v.estado !== false);
+      if (activosV.length) setVendedores(activosV.map((v) => ({ value: v.nombres, label: v.nombres })));
+      const activasF = (forms || []).filter((f) => Boolean(f.estado));
+      setFormulas(activasF.length ? activasF : [FORMULA_INICIAL]);
       setClientes(clis || []);
-      const fActiva = obtenerFormulaActiva(activas.length ? activas : [FORMULA_INICIAL]);
-      setForm((p) => ({ ...p, vendedor: esAdmin ? (p.vendedor || activos?.[0]?.nombres || actual.nombre) : actual.nombre, formulaId: fActiva.id }));
+      const activosS = (servs || []).filter((s) => s.estado !== false).map((s) => ({ value: s.nombre, label: `${s.nombre} ($${s.precio || 0})`, precio: s.precio }));
+      setServicios(activosS.length ? activosS : SERVICIOS_BASE);
+      const activosM = (mets || []).filter((m) => m.estado !== false).map((m) => ({ value: m.nombre, label: m.nombre, moneda: m.moneda }));
+      setTodosMetodos(activosM.length ? activosM : METODOS_BASE);
+      const fActiva = obtenerFormulaActiva(activasF.length ? activasF : [FORMULA_INICIAL]);
+      setForm((p) => ({ ...p, vendedor: esAdmin ? (p.vendedor || activosV?.[0]?.nombres || actual.nombre) : actual.nombre, formulaId: fActiva.id }));
     });
     setClienteEncontrado(null);
   }, [show]);
+
+  const metodosFiltrados = todosMetodos.filter((m) => !m.moneda || m.moneda === form.moneda);
+
+  const handleMonedaChange = (nuevaMoneda) => {
+    const validos = todosMetodos.filter((m) => !m.moneda || m.moneda === nuevaMoneda);
+    const primerMetodo = validos.length ? validos[0].value : 'Efectivo';
+    setForm((p) => ({ ...p, moneda: nuevaMoneda, metodoPago: primerMetodo }));
+  };
+
+  const handleServicioChange = (nuevoServ) => {
+    const s = servicios.find((x) => x.value === nuevoServ);
+    setForm((p) => ({ ...p, servicio: nuevoServ, monto: s?.precio ? Number(s.precio).toFixed(2) : p.monto }));
+  };
 
   const handleCedulaChange = (e) => {
     const val = e.target.value;
@@ -102,11 +123,11 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
                 </div>
               </Col>
             )}
-            <Col xs={12} md={6}><FormSelectField id="mv-servicio" label="Servicio Realizado" value={form.servicio} onChange={(e) => setForm({ ...form, servicio: e.target.value })} options={SERVICIOS} icon="bi-tag" required /></Col>
-            <Col xs={12} md={6}><FormSelectField id="mv-moneda" label="Moneda" value={form.moneda} onChange={(e) => setForm({ ...form, moneda: e.target.value })} options={MONEDAS} icon="bi-coin" required /></Col>
-            <Col xs={12} md={6}><FormInputField id="mv-monto" label={`Monto Original (${form.moneda === 'Bolívares' ? 'Bs' : '$'})`} type="number" value={form.monto} onChange={(e) => setForm({ ...form, monto: e.target.value })} placeholder="15.00" icon="bi-currency-dollar" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-servicio" label="Servicio Realizado" value={form.servicio} onChange={(e) => handleServicioChange(e.target.value)} options={servicios} icon="bi-tag" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-moneda" label="Moneda" value={form.moneda} onChange={(e) => handleMonedaChange(e.target.value)} options={MONEDAS} icon="bi-coin" required /></Col>
+            <Col xs={12} md={6}><FormInputField id="mv-monto" label={`Monto Original (${form.moneda === 'Bolívares' ? 'Bs' : '$'})`} type="number" step="0.5" value={form.monto} onChange={(e) => setForm({ ...form, monto: e.target.value })} placeholder="15.00" icon="bi-currency-dollar" required /></Col>
             <Col xs={12} md={6}><FormSelectField id="mv-formula" label="Fórmula Aplicada" value={form.formulaId} onChange={(e) => setForm({ ...form, formulaId: e.target.value })} options={formulas.map((f) => ({ value: f.id, label: f.nombre }))} icon="bi-calculator" required /></Col>
-            <Col xs={12} md={6}><FormSelectField id="mv-metodo" label="Método de Pago" value={form.metodoPago} onChange={(e) => setForm({ ...form, metodoPago: e.target.value })} options={METODOS} icon="bi-credit-card" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-metodo" label={`Método de Pago (${form.moneda})`} value={form.metodoPago} onChange={(e) => setForm({ ...form, metodoPago: e.target.value })} options={metodosFiltrados} icon="bi-credit-card" required /></Col>
             <Col xs={12} md={6}><FormInputField id="mv-ref" label="Referencia Método de Pago" value={form.referenciaPago} onChange={(e) => setForm({ ...form, referenciaPago: e.target.value })} placeholder="Ej: Ref #849204 / Zelle / Efectivo" icon="bi-hash" /></Col>
           </Row>
         </Modal.Body>

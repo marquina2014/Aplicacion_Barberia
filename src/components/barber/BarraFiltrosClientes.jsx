@@ -40,16 +40,6 @@ const BarraFiltrosClientes = ({
 
   return (
     <div className="mb-4">
-      <div className="d-flex justify-content-end align-items-center mb-3">
-        <Button
-          className="btn-primary-gradient top-action-btn d-flex align-items-center justify-content-center gap-2"
-          onClick={onNuevoCliente}
-        >
-          <i className="bi bi-person-plus-fill"></i>
-          <span>Registrar Cliente</span>
-        </Button>
-      </div>
-
       <div className="dark-card p-3 mb-3">
         <div className="filters-grid-row">
           <Form.Group controlId="fc-nombre">

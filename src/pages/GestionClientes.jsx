@@ -27,7 +27,6 @@ const GestionClientes = () => {
     setTimeout(() => setIsRefreshing(false), 350);
   };
 
-  const handleOpenNew = () => { setEditingId(null); setFormData(initForm); setShowModal(true); };
   const handleOpenEdit = (c) => {
     setEditingId(c.id);
     setFormData({ ...c, nombres: c.nombres || '', cedula: c.cedula || '', telefono: c.telefono || '', estado: typeof c.estado === 'boolean' ? c.estado : true });
@@ -38,7 +37,7 @@ const GestionClientes = () => {
     e.preventDefault();
     if (!formData.nombres || !formData.telefono) return;
     const guardado = await saveCliente({ ...formData, estado: Boolean(formData.estado) }, editingId);
-    setClientes((prev) => editingId ? prev.map((c) => (String(c.id) === String(editingId) ? guardado : c)) : [guardado, ...prev]);
+    setClientes((prev) => prev.map((c) => (String(c.id) === String(editingId) ? guardado : c)));
     setShowModal(false);
   };
 
@@ -51,11 +50,11 @@ const GestionClientes = () => {
   });
 
   return (
-    <MainLayout title="Gestión de Clientes" subtitle="Directorio y fidelidad de clientes">
+    <MainLayout title="Gestión de Clientes" subtitle="Directorio de clientes registrados automáticamente desde los cortes">
       <BarraFiltrosClientes
         filters={filters} onFilterChange={(field, val) => setFilters((prev) => ({ ...prev, [field]: val }))}
         onReset={() => setFilters(initFilters)} onRefresh={handleRefresh}
-        isRefreshing={isRefreshing} onNuevoCliente={handleOpenNew}
+        isRefreshing={isRefreshing}
       />
 
       {filtered.length === 0 ? (
@@ -104,7 +103,7 @@ const GestionClientes = () => {
       <Modal show={showModal} onHide={() => setShowModal(false)} centered contentClassName="dark-card">
         <Modal.Header closeButton closeVariant="white" className="border-gold">
           <Modal.Title className="text-white fw-bold fs-5">
-            <i className="bi bi-person-plus text-gold-accent me-2"></i>{editingId ? 'Editar Cliente' : 'Registrar Cliente'}
+            <i className="bi bi-person-gear text-gold-accent me-2"></i>Editar Cliente
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSave}>
@@ -118,19 +117,17 @@ const GestionClientes = () => {
                 <FormInputField id="c-phone" label="Teléfono de Contacto" type="tel" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} placeholder="+58 412 0000000" icon="bi-telephone" required />
               </Col>
             </Row>
-            {editingId && (
-              <div className="d-flex justify-content-between align-items-center p-2 px-3 mt-2 rounded border border-gold" style={{ background: '#0c0d0e' }}>
-                <span className="small fw-semibold text-white">
-                  <i className={`bi ${formData.estado ? 'bi-check-circle-fill text-gold-accent' : 'bi-slash-circle text-danger'} me-2`}></i>
-                  Estado del cliente: <span className={formData.estado ? 'text-gold-accent' : 'text-danger'}>{formData.estado ? 'Activo' : 'Inactivo'}</span>
-                </span>
-                <Form.Check type="switch" id="c-estado-switch" className="dark-check m-0 fs-5" checked={Boolean(formData.estado)} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} />
-              </div>
-            )}
+            <div className="d-flex justify-content-between align-items-center p-2 px-3 mt-2 rounded border border-gold" style={{ background: '#0c0d0e' }}>
+              <span className="small fw-semibold text-white">
+                <i className={`bi ${formData.estado ? 'bi-check-circle-fill text-gold-accent' : 'bi-slash-circle text-danger'} me-2`}></i>
+                Estado del cliente: <span className={formData.estado ? 'text-gold-accent' : 'text-danger'}>{formData.estado ? 'Activo' : 'Inactivo'}</span>
+              </span>
+              <Form.Check type="switch" id="c-estado-switch" className="dark-check m-0 fs-5" checked={Boolean(formData.estado)} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} />
+            </div>
           </Modal.Body>
           <Modal.Footer className="border-gold">
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-            <Button type="submit" className="btn-primary-gradient px-4">{editingId ? 'Guardar Cambios' : 'Guardar Cliente'}</Button>
+            <Button type="submit" className="btn-primary-gradient px-4">Guardar Cambios</Button>
           </Modal.Footer>
         </Form>
       </Modal>

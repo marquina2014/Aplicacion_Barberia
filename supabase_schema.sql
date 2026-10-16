@@ -58,11 +58,29 @@ CREATE TABLE IF NOT EXISTS public.formulas (
   estado BOOLEAN DEFAULT true
 );
 
+-- 5. TABLA: SERVICIOS (DIMENSIÓN)
+CREATE TABLE IF NOT EXISTS public.servicios (
+  id TEXT PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  precio NUMERIC(10,2) DEFAULT 15,
+  estado BOOLEAN DEFAULT true
+);
+
+-- 6. TABLA: MÉTODOS DE PAGO (DIMENSIÓN BS Y $)
+CREATE TABLE IF NOT EXISTS public.metodos_pago (
+  id TEXT PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  moneda TEXT DEFAULT 'Dólares',
+  estado BOOLEAN DEFAULT true
+);
+
 -- Deshabilitar RLS para acceso API directo
 ALTER TABLE public.vendedores DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clientes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ventas DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.formulas DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.servicios DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.metodos_pago DISABLE ROW LEVEL SECURITY;
 
 -- DATOS INICIALES: ADMINISTRADOR PRINCIPAL
 INSERT INTO public.vendedores (id, usuario, password, email, nombres, rol, sexo, edad, telefono, estado, fotografia) VALUES

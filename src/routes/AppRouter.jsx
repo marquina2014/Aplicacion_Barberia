@@ -4,7 +4,7 @@ import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import GestionVendedores from '../pages/GestionVendedores';
 import GestionClientes from '../pages/GestionClientes';
-import GestionFormulas from '../pages/GestionFormulas';
+import GestionDimensiones from '../pages/GestionDimensiones';
 import VentasDia from '../pages/VentasDia';
 import Historico from '../pages/Historico';
 import BarberForm from '../pages/BarberForm';
@@ -39,7 +39,8 @@ const AppRouter = () => {
         <Route path="/dashboard" element={<RutaProtegida><Dashboard /></RutaProtegida>} />
         <Route path="/vendedores" element={<RutaProtegida soloAdmin><GestionVendedores /></RutaProtegida>} />
         <Route path="/clientes" element={<RutaProtegida soloAdmin><GestionClientes /></RutaProtegida>} />
-        <Route path="/formulas" element={<RutaProtegida><GestionFormulas /></RutaProtegida>} />
+        <Route path="/dimensiones" element={<RutaProtegida soloAdmin><GestionDimensiones /></RutaProtegida>} />
+        <Route path="/formulas" element={<Navigate to="/dimensiones" replace />} />
         <Route path="/ventas-dia" element={<RutaProtegida><VentasDia /></RutaProtegida>} />
         <Route path="/ventas/nueva" element={<Navigate to="/ventas-dia" replace />} />
         <Route path="/historico" element={<RutaProtegida><Historico /></RutaProtegida>} />

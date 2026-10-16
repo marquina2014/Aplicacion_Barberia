@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient';
 import { obtenerUsuarioActual, guardarUsuarioActual } from '../utils/sesionUsuario';
 import { cifrarDatos, descifrarDatos } from '../utils/criptografia';
 
-const leerLocal = (tabla) => {
+export const leerLocal = (tabla) => {
   const base = seedData[tabla] || [];
   try {
     const raw = localStorage.getItem(`legendario_db_v3_${tabla}`);
@@ -18,12 +18,12 @@ const leerLocal = (tabla) => {
   return base;
 };
 
-const escribirLocal = (tabla, lista) => {
+export const escribirLocal = (tabla, lista) => {
   try { localStorage.setItem(`legendario_db_v3_${tabla}`, cifrarDatos(lista)); } catch (_) {}
   return lista;
 };
 
-const sbGet = async (tabla, order = 'id', asc = true) => {
+export const sbGet = async (tabla, order = 'id', asc = true) => {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from(tabla).select('*').order(order, { ascending: asc });
@@ -31,7 +31,7 @@ const sbGet = async (tabla, order = 'id', asc = true) => {
   } catch (_) { return null; }
 };
 
-const sbUpsert = async (tabla, item) => {
+export const sbUpsert = async (tabla, item) => {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from(tabla).upsert(item).select().single();
@@ -120,30 +120,9 @@ export const createVenta = async (venta) => {
   return guardado || venta;
 };
 
-// --- FÓRMULAS ---
-export const getFormulas = async () => {
-  const remotos = await sbGet('formulas', 'id', true);
-  return remotos && remotos.length > 0 ? escribirLocal('formulas', remotos) : leerLocal('formulas');
-};
-
-export const saveFormula = async (formData, editingId = null) => {
-  const listaActual = leerLocal('formulas');
-  const id = editingId || `#F-0${listaActual.length + 1}`;
-  const payload = {
-    ...formData, id: String(id),
-    porcentajeCorte: Number(formData.porcentajeCorte ?? 18),
-    porcentajeReduccion: Number(formData.porcentajeReduccion ?? 50),
-    pasos: Number(formData.pasos || 2),
-    fechaCreacion: formData.fechaCreacion || new Date().toISOString().slice(0, 10),
-    principal: Boolean(formData.principal),
-    estado: typeof formData.estado === 'boolean' ? formData.estado : true
-  };
-  if (supabase && payload.principal) {
-    try { await supabase.from('formulas').update({ principal: false }).neq('id', id); } catch (_) {}
-  }
-  await sbUpsert('formulas', payload);
-  const base = payload.principal ? listaActual.map((f) => ({ ...f, principal: false })) : listaActual;
-  const nueva = editingId ? base.map((f) => (String(f.id) === String(id) ? payload : f)) : [...base, payload];
-  escribirLocal('formulas', nueva);
-  return nueva;
-};
+// --- RE-EXPORTACIÓN DE DIMENSIONES (FÓRMULAS, SERVICIOS, MÉTODOS DE PAGO) ---
+export {
+  getFormulas, saveFormula,
+  getServicios, saveServicio,
+  getMetodosPago, saveMetodoPago
+} from './dimensionesApi';
