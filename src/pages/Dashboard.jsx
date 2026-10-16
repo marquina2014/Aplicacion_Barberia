@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import ModalNuevaVenta from '../components/ventas/ModalNuevaVenta';
-import { createVenta } from '../services/api';
+import { createVenta, getClientes } from '../services/api';
 import { esAdministrador } from '../utils/sesionUsuario';
 
 /**
@@ -12,12 +12,17 @@ import { esAdministrador } from '../utils/sesionUsuario';
  */
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
+  const [totalClientes, setTotalClientes] = useState(0);
   const esAdmin = esAdministrador();
+
+  useEffect(() => {
+    getClientes().then((c) => setTotalClientes(c?.length || 0));
+  }, []);
 
   const metrics = [
     { title: 'Ventas de Hoy', value: '$65.00', icon: 'bi-cash-stack', detail: 'Jornada activa (4 servicios)' },
     { title: 'Barberos Activos', value: '1 Barbero', icon: 'bi-scissors', detail: 'Turno activo' },
-    { title: 'Clientes Registrados', value: '13 Clientes', icon: 'bi-people-fill', detail: 'Directorio activo' },
+    { title: 'Clientes Registrados', value: `${totalClientes} Clientes`, icon: 'bi-people-fill', detail: 'Directorio activo' },
     { title: 'Ticket Promedio', value: '$16.25', icon: 'bi-graph-up-arrow', detail: 'Promedio del día' }
   ];
 

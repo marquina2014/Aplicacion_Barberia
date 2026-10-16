@@ -81,7 +81,7 @@ const Login = () => {
             setFormData({ ...formData, usuario: e.target.value });
             if (errors.usuario) setErrors({ ...errors, usuario: null });
           }}
-          placeholder="Ej: Marquina2014"
+          placeholder="Ej: usuario o correo"
           icon="bi-person"
           error={errors.usuario}
           required

@@ -40,6 +40,11 @@ const sbUpsert = async (tabla, item) => {
       const res = await supabase.from(tabla).upsert(sinRef).select().single();
       return !res.error && res.data ? { ...res.data, referenciaPago } : null;
     }
+    if (error && tabla === 'clientes' && error.message?.includes('cedula')) {
+      const { cedula, ...sinCed } = item;
+      const res = await supabase.from(tabla).upsert(sinCed).select().single();
+      return !res.error && res.data ? { ...res.data, cedula } : null;
+    }
     return !error && data ? data : null;
   } catch (_) { return null; }
 };
@@ -70,15 +75,11 @@ export const saveVendedor = async (formData, editingId = null) => {
 // --- CLIENTES ---
 export const getClientes = async () => {
   const remotos = await sbGet('clientes', 'id', true);
-  return remotos && remotos.length > 0 ? escribirLocal('clientes', remotos) : leerLocal('clientes');
+  return remotos ? escribirLocal('clientes', remotos) : leerLocal('clientes');
 };
 
 export const saveCliente = async (formData, editingId = null) => {
-  const payload = {
-    ...formData, visitas: formData.visitas ?? 1,
-    ultimo: formData.ultimo || 'Nuevo Registro',
-    estado: typeof formData.estado === 'boolean' ? formData.estado : true
-  };
+  const payload = { ...formData, cedula: formData.cedula?.trim() || '', visitas: formData.visitas ?? 1, ultimo: formData.ultimo || 'Nuevo Registro', estado: typeof formData.estado === 'boolean' ? formData.estado : true };
   const item = { ...payload, id: String(editingId || Date.now()) };
   const guardado = await sbUpsert('clientes', item);
   const lista = leerLocal('clientes');
@@ -89,17 +90,19 @@ export const saveCliente = async (formData, editingId = null) => {
 
 export const createCliente = (nuevo) => saveCliente(nuevo, null);
 
-export const syncClienteDesdeVenta = async (nombre, telefono = '', servicio = '') => {
+export const syncClienteDesdeVenta = async (nombre, cedula = '', telefono = '', servicio = '') => {
   if (!nombre?.trim()) return null;
-  const nombreNorm = nombre.trim().toLowerCase();
-  const existente = (await getClientes()).find((c) => (c.nombres || '').trim().toLowerCase() === nombreNorm);
+  const nNorm = nombre.trim().toLowerCase();
+  const cNorm = cedula?.trim().toLowerCase();
+  const existente = (await getClientes()).find((c) => (cNorm && (c.cedula || '').trim().toLowerCase() === cNorm) || (c.nombres || '').trim().toLowerCase() === nNorm);
   if (existente) {
     return saveCliente({
-      ...existente, visitas: (Number(existente.visitas) || 1) + 1,
+      ...existente, cedula: cedula?.trim() || existente.cedula || '',
+      visitas: (Number(existente.visitas) || 1) + 1,
       ultimo: servicio || existente.ultimo, telefono: telefono?.trim() || existente.telefono || ''
     }, existente.id);
   }
-  return createCliente({ nombres: nombre.trim(), telefono: telefono?.trim() || '', visitas: 1, ultimo: servicio || 'Corte Clásico', estado: true });
+  return createCliente({ nombres: nombre.trim(), cedula: cedula?.trim() || '', telefono: telefono?.trim() || '', visitas: 1, ultimo: servicio || 'Corte Clásico', estado: true });
 };
 
 // --- VENTAS ---

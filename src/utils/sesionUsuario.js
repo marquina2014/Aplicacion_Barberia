@@ -10,8 +10,8 @@ const JWT_SECRET = 'legendario_barber_shop_jwt_secret_2026';
 const JWT_MAX_EXP_SECONDS = 60 * 60 * 24 * 365 * 10; // 10 años
 
 const USUARIO_POR_DEFECTO = {
-  id: '1', usuario: 'Marquina2014', email: 'Luiseduardo15097@gmail.com',
-  nombre: 'luis marquina', rol: 'administrador', fotoUrl: ''
+  id: '1', usuario: 'admin', email: 'admin@legendario.com',
+  nombre: 'Administrador', rol: 'administrador', fotoUrl: ''
 };
 
 const base64UrlEncode = (obj) => {
@@ -97,9 +97,9 @@ export const esAdministrador = (usuario = obtenerUsuarioActual()) =>
 export const guardarUsuarioActual = (vendedor) => {
   const sesion = {
     id: String(vendedor.id || '1'),
-    usuario: vendedor.usuario || 'Marquina2014',
-    email: vendedor.email || 'Luiseduardo15097@gmail.com',
-    nombre: vendedor.nombres || vendedor.nombre || 'luis marquina',
+    usuario: vendedor.usuario || 'admin',
+    email: vendedor.email || '',
+    nombre: vendedor.nombres || vendedor.nombre || 'Administrador',
     rol: vendedor.rol || 'barbero',
     fotoUrl: vendedor.fotografia ?? vendedor.fotoUrl ?? ''
   };

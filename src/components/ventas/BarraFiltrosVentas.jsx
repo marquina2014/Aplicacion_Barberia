@@ -27,7 +27,7 @@ const PAGOS_OPTS = [
  */
 const BarraFiltrosVentas = ({
   modo = 'dia', filters, onFilterChange, onReset, onRefresh, isRefreshing,
-  onNuevaVenta, onExportExcel, vendedores = ['luis marquina', 'Sofia marcano'], vendedorDisabled = false
+  onNuevaVenta, onExportExcel, vendedores = [], vendedorDisabled = false
 }) => {
   const [showConfirmExcel, setShowConfirmExcel] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
