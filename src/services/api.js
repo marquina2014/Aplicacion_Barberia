@@ -35,10 +35,12 @@ const sbUpsert = async (tabla, item) => {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from(tabla).upsert(item).select().single();
-    if (error && tabla === 'ventas' && error.message?.includes('referenciaPago')) {
-      const { referenciaPago, ...sinRef } = item;
-      const res = await supabase.from(tabla).upsert(sinRef).select().single();
-      return !res.error && res.data ? { ...res.data, referenciaPago } : null;
+    if (error && tabla === 'ventas') {
+      const limpio = { ...item };
+      if (error.message?.includes('referenciaPago')) delete limpio.referenciaPago;
+      if (error.message?.includes('moneda')) delete limpio.moneda;
+      const res = await supabase.from(tabla).upsert(limpio).select().single();
+      return !res.error && res.data ? { ...res.data, ...item } : null;
     }
     if (error && tabla === 'clientes' && error.message?.includes('cedula')) {
       const { cedula, ...sinCed } = item;

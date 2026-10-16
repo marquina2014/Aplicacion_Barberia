@@ -73,8 +73,10 @@ const VentasDia = () => {
   };
 
   const filtered = ventas.filter(cumpleFiltro);
-  const totalMonto = filtered.reduce((acc, curr) => acc + Number(curr.monto || 0), 0);
-  const totalFinal = filtered.reduce((acc, curr) => acc + calcularMontoFinal(curr.monto, formulaActiva), 0);
+  const origUSD = filtered.filter((v) => v.moneda !== 'Bolívares').reduce((acc, c) => acc + Number(c.monto || 0), 0);
+  const finalUSD = filtered.filter((v) => v.moneda !== 'Bolívares').reduce((acc, c) => acc + (c.montoFinal !== undefined ? Number(c.montoFinal) : calcularMontoFinal(c.monto, formulaActiva)), 0);
+  const origBS = filtered.filter((v) => v.moneda === 'Bolívares').reduce((acc, c) => acc + Number(c.monto || 0), 0);
+  const finalBS = filtered.filter((v) => v.moneda === 'Bolívares').reduce((acc, c) => acc + (c.montoFinal !== undefined ? Number(c.montoFinal) : calcularMontoFinal(c.monto, formulaActiva)), 0);
   const visibles = filtered.slice(0, 30);
 
   const handleExportar = async () => {
@@ -97,37 +99,37 @@ const VentasDia = () => {
       <Row className="g-3 mb-3">
         <Col xs={6} lg={3}>
           <div className="metric-card p-3">
-            <small className="text-secondary-custom d-block mb-1">Monto Original Hoy</small>
-            <h3 className="fw-bold text-white m-0">${totalMonto.toFixed(2)}</h3>
+            <small className="text-secondary-custom d-block mb-1">Original en Dólares ($)</small>
+            <h3 className="fw-bold text-white m-0">${origUSD.toFixed(2)}</h3>
           </div>
         </Col>
         <Col xs={6} lg={3}>
           <div className="metric-card p-3">
-            <small className="text-secondary-custom d-block mb-1">Monto Final (Barbero)</small>
-            <h3 className="fw-bold text-gold-accent m-0">${totalFinal.toFixed(2)}</h3>
+            <small className="text-secondary-custom d-block mb-1">Fórmula Aplicada ($)</small>
+            <h3 className="fw-bold text-gold-accent m-0">${finalUSD.toFixed(2)}</h3>
           </div>
         </Col>
         <Col xs={6} lg={3}>
           <div className="metric-card p-3">
-            <small className="text-secondary-custom d-block mb-1">Servicios Realizados</small>
-            <h3 className="fw-bold text-white m-0">{filtered.length} Cortes</h3>
+            <small className="text-secondary-custom d-block mb-1">Original en Bolívares (Bs)</small>
+            <h3 className="fw-bold text-white m-0">Bs. {origBS.toFixed(2)}</h3>
           </div>
         </Col>
         <Col xs={6} lg={3}>
           <div className="metric-card p-3">
-            <small className="text-secondary-custom d-block mb-1">Barbero Destacado</small>
-            <h4 className="fw-bold text-gold-accent m-0 fs-5">{filtered[0]?.vendedor || usuario.nombre}</h4>
+            <small className="text-secondary-custom d-block mb-1">Fórmula Aplicada (Bs)</small>
+            <h3 className="fw-bold text-gold-accent m-0">Bs. {finalBS.toFixed(2)}</h3>
           </div>
         </Col>
       </Row>
 
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <span className="small text-secondary-custom">
-          Mostrando <strong className="text-white">{visibles.length}</strong> de <strong className="text-white">{filtered.length}</strong> registro(s)
+          Mostrando <strong className="text-white">{visibles.length}</strong> de <strong className="text-white">{filtered.length}</strong> corte(s) hoy
         </span>
-        <div className="d-flex gap-2">
-          <Badge bg="dark" className="badge-pill-custom fs-6">Original: <span className="text-white fw-bold">${totalMonto.toFixed(2)}</span></Badge>
-          <Badge bg="dark" className="badge-pill-custom fs-6">Final: <span className="text-white fw-bold">${totalFinal.toFixed(2)}</span></Badge>
+        <div className="d-flex flex-wrap gap-2">
+          <Badge bg="dark" className="badge-pill-custom fs-6">USD: <span className="text-white fw-bold">${origUSD.toFixed(2)}</span> | Final: <span className="text-gold-accent fw-bold">${finalUSD.toFixed(2)}</span></Badge>
+          <Badge bg="dark" className="badge-pill-custom fs-6">Bs: <span className="text-white fw-bold">Bs. {origBS.toFixed(2)}</span> | Final: <span className="text-gold-accent fw-bold">Bs. {finalBS.toFixed(2)}</span></Badge>
         </div>
       </div>
 

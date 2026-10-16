@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS public.ventas (
   vendedor TEXT NOT NULL,
   cliente TEXT NOT NULL,
   servicio TEXT NOT NULL,
+  moneda TEXT DEFAULT 'Dólares',
   "formulaAplicada" TEXT DEFAULT 'Fórmula Inicial',
   monto NUMERIC(10,2) NOT NULL,
   "montoFinal" NUMERIC(10,2) NOT NULL,

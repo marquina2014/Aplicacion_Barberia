@@ -13,13 +13,8 @@ const SERVICIOS = [
   { value: 'Combo Legendario', label: 'Combo Legendario ($22)' },
   { value: 'Tratamiento Capilar', label: 'Tratamiento Capilar ($18)' }
 ];
-const METODOS = [
-  { value: 'Efectivo', label: 'Efectivo (USD / Bs)' },
-  { value: 'Pago Móvil', label: 'Pago Móvil' },
-  { value: 'Tarjeta', label: 'Punto de Venta / Tarjeta' },
-  { value: 'Zelle', label: 'Zelle' }
-];
-
+const MONEDAS = [{ value: 'Dólares', label: 'Dólares ($)' }, { value: 'Bolívares', label: 'Bolívares (Bs)' }];
+const METODOS = [{ value: 'Efectivo', label: 'Efectivo' }, { value: 'Pago Móvil', label: 'Pago Móvil' }, { value: 'Tarjeta', label: 'Punto de Venta / Tarjeta' }, { value: 'Zelle', label: 'Zelle' }];
 const normCed = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
 const ModalNuevaVenta = ({ show, onHide, onSave }) => {
@@ -27,8 +22,8 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
   const esAdmin = esAdministrador(usuario);
   const initForm = {
     vendedor: usuario?.nombre || '',
-    cedula: '', cliente: '', telefono: '', servicio: 'Corte Clásico', monto: '15.00',
-    metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
+    cedula: '', cliente: '', telefono: '', servicio: 'Corte Clásico', moneda: 'Dólares',
+    monto: '15.00', metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
   };
   const [form, setForm] = useState(initForm);
   const [vendedores, setVendedores] = useState([]);
@@ -55,12 +50,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     const val = e.target.value;
     const match = val.trim().length >= 4 && clientes.find((c) => normCed(c.cedula) === normCed(val));
     setClienteEncontrado(match || null);
-    setForm((p) => ({
-      ...p,
-      cedula: val,
-      cliente: match ? match.nombres : p.cliente,
-      telefono: match ? (match.telefono || '') : p.telefono
-    }));
+    setForm((p) => ({ ...p, cedula: val, cliente: match ? match.nombres : p.cliente, telefono: match ? (match.telefono || '') : p.telefono }));
   };
 
   const handleSubmit = async (e) => {
@@ -77,6 +67,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       cliente: form.cliente.trim(),
       cedulaCliente: form.cedula.trim(),
       servicio: form.servicio,
+      moneda: form.moneda || 'Dólares',
       formulaAplicada: formulaUsada.nombre,
       monto: montoOrig,
       montoFinal: calcularMontoFinal(montoOrig, formulaUsada),
@@ -96,19 +87,13 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       <Form onSubmit={handleSubmit}>
         <Modal.Body className="p-3 p-md-4">
           <Row className="g-3">
-            <Col xs={12} md={6}>
-              <FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required />
-            </Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required /></Col>
             <Col xs={12} md={6}>
               <FormInputField id="mv-cedula" label="Cédula del Cliente (Buscar / Registrar)" value={form.cedula} list="lista-cedulas-registradas" onChange={handleCedulaChange} placeholder="Ej: V-28123456" icon="bi-card-text" />
               <datalist id="lista-cedulas-registradas">{clientes.filter((c) => c.cedula).map((c) => <option key={c.id} value={c.cedula}>{c.nombres}</option>)}</datalist>
             </Col>
-            <Col xs={12} md={6}>
-              <FormInputField id="mv-cliente" label="Nombre y Apellido del Cliente" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Ej: Carlos Mendoza" icon="bi-person" required />
-            </Col>
-            <Col xs={12} md={6}>
-              <FormInputField id="mv-tel-cliente" label="Teléfono de Contacto" type="tel" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} placeholder="+58 412 0000000" icon="bi-telephone" />
-            </Col>
+            <Col xs={12} md={6}><FormInputField id="mv-cliente" label="Nombre y Apellido del Cliente" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Ej: Carlos Mendoza" icon="bi-person" required /></Col>
+            <Col xs={12} md={6}><FormInputField id="mv-tel-cliente" label="Teléfono de Contacto" type="tel" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} placeholder="+58 412 0000000" icon="bi-telephone" /></Col>
             {clienteEncontrado && (
               <Col xs={12}>
                 <div className="alert alert-success py-2 px-3 m-0 small border-gold d-flex align-items-center justify-content-between rounded" style={{ background: '#0f2415', color: '#75e69e', borderColor: '#2b8a3e' }}>
@@ -117,21 +102,12 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
                 </div>
               </Col>
             )}
-            <Col xs={12} md={6}>
-              <FormSelectField id="mv-servicio" label="Servicio Realizado" value={form.servicio} onChange={(e) => setForm({ ...form, servicio: e.target.value })} options={SERVICIOS} icon="bi-tag" required />
-            </Col>
-            <Col xs={12} md={6}>
-              <FormInputField id="mv-monto" label="Monto Original ($)" type="number" value={form.monto} onChange={(e) => setForm({ ...form, monto: e.target.value })} placeholder="15.00" icon="bi-currency-dollar" required />
-            </Col>
-            <Col xs={12} md={6}>
-              <FormSelectField id="mv-formula" label="Fórmula Aplicada" value={form.formulaId} onChange={(e) => setForm({ ...form, formulaId: e.target.value })} options={formulas.map((f) => ({ value: f.id, label: f.nombre }))} icon="bi-calculator" required />
-            </Col>
-            <Col xs={12} md={6}>
-              <FormSelectField id="mv-metodo" label="Método de Pago" value={form.metodoPago} onChange={(e) => setForm({ ...form, metodoPago: e.target.value })} options={METODOS} icon="bi-credit-card" required />
-            </Col>
-            <Col xs={12}>
-              <FormInputField id="mv-ref" label="Referencia Método de Pago" value={form.referenciaPago} onChange={(e) => setForm({ ...form, referenciaPago: e.target.value })} placeholder="Ej: Ref #849204 / Comprobante Pago Móvil / Titular Zelle / Efectivo" icon="bi-hash" />
-            </Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-servicio" label="Servicio Realizado" value={form.servicio} onChange={(e) => setForm({ ...form, servicio: e.target.value })} options={SERVICIOS} icon="bi-tag" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-moneda" label="Moneda" value={form.moneda} onChange={(e) => setForm({ ...form, moneda: e.target.value })} options={MONEDAS} icon="bi-coin" required /></Col>
+            <Col xs={12} md={6}><FormInputField id="mv-monto" label={`Monto Original (${form.moneda === 'Bolívares' ? 'Bs' : '$'})`} type="number" value={form.monto} onChange={(e) => setForm({ ...form, monto: e.target.value })} placeholder="15.00" icon="bi-currency-dollar" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-formula" label="Fórmula Aplicada" value={form.formulaId} onChange={(e) => setForm({ ...form, formulaId: e.target.value })} options={formulas.map((f) => ({ value: f.id, label: f.nombre }))} icon="bi-calculator" required /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-metodo" label="Método de Pago" value={form.metodoPago} onChange={(e) => setForm({ ...form, metodoPago: e.target.value })} options={METODOS} icon="bi-credit-card" required /></Col>
+            <Col xs={12} md={6}><FormInputField id="mv-ref" label="Referencia Método de Pago" value={form.referenciaPago} onChange={(e) => setForm({ ...form, referenciaPago: e.target.value })} placeholder="Ej: Ref #849204 / Zelle / Efectivo" icon="bi-hash" /></Col>
           </Row>
         </Modal.Body>
         <Modal.Footer className="border-gold">

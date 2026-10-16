@@ -2,7 +2,7 @@ import { calcularMontoFinal, FORMULA_INICIAL } from './formulasUtils';
 
 /**
  * Generador nativo de archivos Microsoft Excel (.xlsx - OpenXML) sin dependencias externas.
- * Incluye columnas de Fórmula Aplicada, Monto Original ($) y Monto Final ($).
+ * Incluye columnas de Moneda, Fórmula Aplicada, Monto Original y Monto Final.
  */
 const crcTable = (() => {
   const table = new Uint32Array(256);
@@ -69,9 +69,9 @@ const celdaTexto = (ref, texto, style = 4) => `<c r="${ref}" s="${style}" t="inl
 const celdaNumero = (ref, num, style = 2) => `<c r="${ref}" s="${style}" t="n"><v>${Number(num || 0)}</v></c>`;
 
 export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario', formula = FORMULA_INICIAL) => {
-  const colsTexto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero', 'Cliente', 'Servicio Realizado', 'Fórmula Aplicada', 'Método de Pago', 'Referencia Método de Pago', 'Monto Original ($)', 'Monto Final ($)'];
-  const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+  const colsTexto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const headers = ['ID Venta', 'Fecha', 'Registro / Hora', 'Barbero', 'Cliente', 'Servicio Realizado', 'Moneda', 'Fórmula Aplicada', 'Método de Pago', 'Referencia Pago', 'Monto Original', 'Monto Final'];
+  const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
   let filasXml = `<row r="1" ht="24" customHeight="1">${headers.map((h, i) => celdaTexto(`${letras[i]}1`, h, 1)).join('')}</row>`;
   let totalOriginal = 0;
@@ -88,15 +88,15 @@ export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario
       celdaTexto(`A${r}`, v.id || '') + celdaTexto(`B${r}`, v.fechaISO || '') +
       celdaTexto(`C${r}`, v.fechaHora || '') + celdaTexto(`D${r}`, v.vendedor || '') +
       celdaTexto(`E${r}`, v.cliente || '') + celdaTexto(`F${r}`, v.servicio || '') +
-      celdaTexto(`G${r}`, nombreFormula) + celdaTexto(`H${r}`, v.pago || '') +
-      celdaTexto(`I${r}`, v.referenciaPago || '') +
-      celdaNumero(`J${r}`, montoOrig, 2) + celdaNumero(`K${r}`, montoFin, 2) + `</row>`;
+      celdaTexto(`G${r}`, v.moneda || 'Dólares') + celdaTexto(`H${r}`, nombreFormula) +
+      celdaTexto(`I${r}`, v.pago || '') + celdaTexto(`J${r}`, v.referenciaPago || '') +
+      celdaNumero(`K${r}`, montoOrig, 2) + celdaNumero(`L${r}`, montoFin, 2) + `</row>`;
   });
 
   const filaTotal = ventas.length + 2;
   filasXml += `<row r="${filaTotal}" ht="22" customHeight="1">` +
-    colsTexto.map((c, i) => celdaTexto(`${c}${filaTotal}`, i === 8 ? 'TOTAL FACTURADO' : '', 1)).join('') +
-    celdaNumero(`J${filaTotal}`, totalOriginal, 3) + celdaNumero(`K${filaTotal}`, totalFinal, 3) + `</row>`;
+    colsTexto.map((c, i) => celdaTexto(`${c}${filaTotal}`, i === 9 ? 'TOTAL FACTURADO' : '', 1)).join('') +
+    celdaNumero(`K${filaTotal}`, totalOriginal, 3) + celdaNumero(`L${filaTotal}`, totalFinal, 3) + `</row>`;
 
   const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -104,33 +104,20 @@ export const exportarVentasExcel = (ventas = [], nombreBase = 'Ventas_Legendario
     <col min="1" max="1" width="14" customWidth="1"/><col min="2" max="2" width="15" customWidth="1"/>
     <col min="3" max="3" width="18" customWidth="1"/><col min="4" max="4" width="24" customWidth="1"/>
     <col min="5" max="5" width="24" customWidth="1"/><col min="6" max="6" width="26" customWidth="1"/>
-    <col min="7" max="7" width="24" customWidth="1"/><col min="8" max="8" width="18" customWidth="1"/>
-    <col min="9" max="9" width="28" customWidth="1"/><col min="10" max="10" width="20" customWidth="1"/>
-    <col min="11" max="11" width="20" customWidth="1"/>
+    <col min="7" max="7" width="16" customWidth="1"/><col min="8" max="8" width="24" customWidth="1"/>
+    <col min="9" max="9" width="18" customWidth="1"/><col min="10" max="10" width="26" customWidth="1"/>
+    <col min="11" max="11" width="20" customWidth="1"/><col min="12" max="12" width="20" customWidth="1"/>
   </cols>
   <sheetData>${filasXml}</sheetData>
 </worksheet>`;
 
   const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <numFmts count="1"><numFmt numFmtId="164" formatCode="$#,##0.00"/></numFmts>
-  <fonts count="2">
-    <font><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font>
-    <font><b/><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font>
-  </fonts>
+  <numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0.00"/></numFmts>
+  <fonts count="2"><font><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font></fonts>
   <fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
-  <borders count="3">
-    <border><left/><right/><top/><bottom/><diagonal/></border>
-    <border><left style="thin"><color rgb="FFD4AF37"/></left><right style="thin"><color rgb="FFD4AF37"/></right><top style="thin"><color rgb="FFD4AF37"/></top><bottom style="thin"><color rgb="FFD4AF37"/></bottom><diagonal/></border>
-    <border><left style="medium"><color rgb="FFD4AF37"/></left><right style="medium"><color rgb="FFD4AF37"/></right><top style="medium"><color rgb="FFD4AF37"/></top><bottom style="medium"><color rgb="FFD4AF37"/></bottom><diagonal/></border>
-  </borders>
-  <cellXfs count="5">
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
-    <xf numFmtId="0" fontId="1" fillId="0" borderId="2" applyFont="1" applyBorder="1"/>
-    <xf numFmtId="164" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
-    <xf numFmtId="164" fontId="1" fillId="0" borderId="2" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" applyFont="1" applyBorder="1"/>
-  </cellXfs>
+  <borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFD4AF37"/></left><right style="thin"><color rgb="FFD4AF37"/></right><top style="thin"><color rgb="FFD4AF37"/></top><bottom style="thin"><color rgb="FFD4AF37"/></bottom><diagonal/></border><border><left style="medium"><color rgb="FFD4AF37"/></left><right style="medium"><color rgb="FFD4AF37"/></right><top style="medium"><color rgb="FFD4AF37"/></top><bottom style="medium"><color rgb="FFD4AF37"/></bottom><diagonal/></border></borders>
+  <cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="2" applyFont="1" applyBorder="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyFont="1" applyBorder="1"/><xf numFmtId="164" fontId="1" fillId="0" borderId="2" applyNumberFormat="1" applyFont="1" applyBorder="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" applyFont="1" applyBorder="1"/></cellXfs>
 </styleSheet>`;
 
   const blob = crearZipStore([
