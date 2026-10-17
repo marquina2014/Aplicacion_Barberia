@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Offcanvas } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SidebarMenu from './SidebarMenu';
 import UserHeaderChip from './UserHeaderChip';
 import { cerrarSesion, tieneSesionActiva } from '../../utils/sesionUsuario';
@@ -13,6 +13,7 @@ import { cerrarSesion, tieneSesionActiva } from '../../utils/sesionUsuario';
  */
 const MainLayout = ({ children, title, subtitle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
@@ -88,9 +89,11 @@ const MainLayout = ({ children, title, subtitle }) => {
           </div>
         </header>
 
-        {/* Contenido dinámico con scroll independiente */}
+        {/* Contenido dinámico con scroll independiente y efecto de movimiento */}
         <main className="flex-grow-1 p-3 p-md-4 overflow-auto">
-          {children}
+          <div key={location.pathname} className="page-transition-wrapper">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -1,13 +1,22 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { calcularMontoFinal, FORMULA_INICIAL } from '../../utils/formulasUtils';
+import GoldLoader from '../common/GoldLoader';
 
 /**
  * Componente: ListaVentas
  * Propósito: Lista de ventas compartida por "Ventas del Día" e "Histórico".
  * Incluye columnas de Moneda, Fórmula Aplicada, Monto Original, Monto Final y Referencia Método de Pago.
  */
-const ListaVentas = ({ ventas, formula = FORMULA_INICIAL }) => {
+const ListaVentas = ({ ventas, formula = FORMULA_INICIAL, loading = false }) => {
+  if (loading) {
+    return (
+      <div className="table-container-card p-4 text-center">
+        <GoldLoader text="Cargando ventas..." subtext="Consultando registros y fórmulas..." />
+      </div>
+    );
+  }
+
   if (ventas.length === 0) {
     return (
       <div className="table-container-card p-4 text-center text-muted-custom">

@@ -10,7 +10,8 @@ const TabMetodosPago = () => {
   const [metodos, setMetodos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [filtroId, setFiltroId] = useState('');
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroMoneda, setFiltroMoneda] = useState('');
   const initForm = { nombre: '', moneda: 'Dólares', estado: true };
   const [form, setForm] = useState(initForm);
 
@@ -32,24 +33,31 @@ const TabMetodosPago = () => {
     setShowModal(false);
   };
 
-  const filtrados = metodos.filter((m) => !filtroId || m.id === filtroId);
+  const filtrados = metodos.filter((m) => {
+    if (filtroNombre && m.nombre !== filtroNombre) return false;
+    if (filtroMoneda && m.moneda !== filtroMoneda) return false;
+    return true;
+  });
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <div style={{ maxWidth: '380px', width: '100%' }}>
-          <Form.Select
-            className="dark-input"
-            value={filtroId}
-            onChange={(e) => setFiltroId(e.target.value)}
-          >
-            <option value="">Todos los métodos de pago ({metodos.length})</option>
-            {metodos.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre} — Moneda: {m.moneda || 'Dólares'}
-              </option>
-            ))}
-          </Form.Select>
+        <div className="d-flex flex-wrap align-items-center gap-2" style={{ flex: '1 1 auto', maxWidth: '620px' }}>
+          <div style={{ minWidth: '220px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroNombre} onChange={(e) => setFiltroNombre(e.target.value)}>
+              <option value="">Todos los métodos ({metodos.length})</option>
+              {metodos.map((m) => (
+                <option key={m.id} value={m.nombre}>{m.nombre}</option>
+              ))}
+            </Form.Select>
+          </div>
+          <div style={{ minWidth: '180px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroMoneda} onChange={(e) => setFiltroMoneda(e.target.value)}>
+              <option value="">Todas las monedas</option>
+              <option value="Dólares">Dólares ($)</option>
+              <option value="Bolívares">Bolívares (Bs)</option>
+            </Form.Select>
+          </div>
         </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={handleOpenNew}>
           <i className="bi bi-plus-circle-fill"></i><span>Nuevo Método de Pago</span>
@@ -65,7 +73,7 @@ const TabMetodosPago = () => {
           </thead>
           <tbody>
             {filtrados.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay métodos de pago registrados.</td></tr>
+              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay métodos de pago que coincidan.</td></tr>
             ) : filtrados.map((m) => (
               <tr key={m.id}>
                 <td className="fw-bold text-gold-accent">{m.id}</td>

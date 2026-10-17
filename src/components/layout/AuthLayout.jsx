@@ -22,7 +22,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
 
       <Container className="d-flex justify-content-center">
         {/* Tarjeta oscura con elevación suave inspirada en la imagen de referencia */}
-        <Card className="dark-card auth-card">
+        <Card className="dark-card auth-card page-transition-wrapper">
           {/* Cabecera con logotipo de marca */}
           <div className="d-flex justify-content-center mb-4">
             <BrandLogo size="large" />

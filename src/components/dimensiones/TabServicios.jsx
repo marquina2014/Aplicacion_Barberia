@@ -7,7 +7,8 @@ const TabServicios = () => {
   const [servicios, setServicios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [filtroId, setFiltroId] = useState('');
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroPrecio, setFiltroPrecio] = useState('');
   const initForm = { nombre: '', precio: 15, estado: true };
   const [form, setForm] = useState(initForm);
 
@@ -29,24 +30,34 @@ const TabServicios = () => {
     setShowModal(false);
   };
 
-  const filtrados = servicios.filter((s) => !filtroId || s.id === filtroId);
+  const filtrados = servicios.filter((s) => {
+    if (filtroNombre && s.nombre !== filtroNombre) return false;
+    if (filtroPrecio !== '' && Number(s.precio || 0) !== Number(filtroPrecio)) return false;
+    return true;
+  });
+
+  const preciosUnicos = [...new Set(servicios.map((s) => Number(s.precio || 0)))].sort((a, b) => a - b);
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <div style={{ maxWidth: '380px', width: '100%' }}>
-          <Form.Select
-            className="dark-input"
-            value={filtroId}
-            onChange={(e) => setFiltroId(e.target.value)}
-          >
-            <option value="">Todos los servicios ({servicios.length})</option>
-            {servicios.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nombre} — Precio: ${Number(s.precio || 0).toFixed(2)}
-              </option>
-            ))}
-          </Form.Select>
+        <div className="d-flex flex-wrap align-items-center gap-2" style={{ flex: '1 1 auto', maxWidth: '620px' }}>
+          <div style={{ minWidth: '220px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroNombre} onChange={(e) => setFiltroNombre(e.target.value)}>
+              <option value="">Todos los servicios ({servicios.length})</option>
+              {servicios.map((s) => (
+                <option key={s.id} value={s.nombre}>{s.nombre}</option>
+              ))}
+            </Form.Select>
+          </div>
+          <div style={{ minWidth: '180px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroPrecio} onChange={(e) => setFiltroPrecio(e.target.value)}>
+              <option value="">Todos los precios base</option>
+              {preciosUnicos.map((p) => (
+                <option key={p} value={p}>Precio: ${Number(p).toFixed(2)}</option>
+              ))}
+            </Form.Select>
+          </div>
         </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={handleOpenNew}>
           <i className="bi bi-plus-circle-fill"></i><span>Nuevo Servicio</span>
@@ -62,7 +73,7 @@ const TabServicios = () => {
           </thead>
           <tbody>
             {filtrados.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay servicios registrados.</td></tr>
+              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay servicios que coincidan.</td></tr>
             ) : filtrados.map((s) => (
               <tr key={s.id}>
                 <td className="fw-bold text-gold-accent">{s.id}</td>

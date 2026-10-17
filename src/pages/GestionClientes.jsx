@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button, Form, Modal } from 'react-bootstrap';
 import MainLayout from '../components/layout/MainLayout';
 import FormInputField from '../components/common/FormInputField';
+import GoldLoader from '../components/common/GoldLoader';
 import BarraFiltrosClientes from '../components/barber/BarraFiltrosClientes';
 import { getClientes, saveCliente } from '../services/api';
 
@@ -57,7 +58,11 @@ const GestionClientes = () => {
         isRefreshing={isRefreshing}
       />
 
-      {filtered.length === 0 ? (
+      {isRefreshing ? (
+        <div className="table-container-card p-4 text-center">
+          <GoldLoader text="Actualizando clientes..." subtext="Consultando directorio..." icon="bi-people" />
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="table-container-card p-4 text-center text-muted-custom">
           <i className="bi bi-people fs-3 d-block mb-2"></i>
           No hay clientes registrados o que coincidan con los filtros.

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
+import GoldLoader from '../common/GoldLoader';
 import { getLocalDateISO } from '../../utils/dateUtils';
 import { getVendedores, getFormulas, getClientes, getServicios, getMetodosPago, syncClienteDesdeVenta } from '../../services/api';
 import { obtenerUsuarioActual, esAdministrador } from '../../utils/sesionUsuario';
@@ -26,12 +27,9 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     moneda: 'Dólares', monto: '15.00', metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
   };
   const [form, setForm] = useState(initForm);
-  const [vendedores, setVendedores] = useState([]);
-  const [formulas, setFormulas] = useState([FORMULA_INICIAL]);
-  const [clientes, setClientes] = useState([]);
-  const [servicios, setServicios] = useState(SERVICIOS_BASE);
-  const [todosMetodos, setTodosMetodos] = useState(METODOS_BASE);
-  const [clienteEncontrado, setClienteEncontrado] = useState(null), [isBuscando, setIsBuscando] = useState(false);
+  const [vendedores, setVendedores] = useState([]), [formulas, setFormulas] = useState([FORMULA_INICIAL]);
+  const [clientes, setClientes] = useState([]), [servicios, setServicios] = useState(SERVICIOS_BASE), [todosMetodos, setTodosMetodos] = useState(METODOS_BASE);
+  const [clienteEncontrado, setClienteEncontrado] = useState(null), [isBuscando, setIsBuscando] = useState(false), [isSaving, setIsSaving] = useState(false);
   const timerBusqueda = useRef(null);
 
   useEffect(() => {
@@ -50,17 +48,14 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       const fActiva = obtenerFormulaActiva(activasF.length ? activasF : [FORMULA_INICIAL]);
       setForm((p) => ({ ...p, vendedor: esAdmin ? (p.vendedor || activosV?.[0]?.nombres || actual.nombre) : actual.nombre, formulaId: fActiva.id }));
     });
-    setClienteEncontrado(null);
-    setIsBuscando(false);
+    setClienteEncontrado(null); setIsBuscando(false);
   }, [show]);
 
   const metodosFiltrados = todosMetodos.filter((m) => !m.moneda || m.moneda === form.moneda);
-
   const handleMonedaChange = (nuevaMoneda) => {
     const validos = todosMetodos.filter((m) => !m.moneda || m.moneda === nuevaMoneda);
     setForm((p) => ({ ...p, moneda: nuevaMoneda, metodoPago: validos[0]?.value || 'Efectivo' }));
   };
-
   const handleServicioChange = (nuevoServ) => {
     const s = servicios.find((x) => x.value === nuevoServ);
     setForm((p) => ({ ...p, servicio: nuevoServ, monto: s?.precio ? Number(s.precio).toFixed(2) : p.monto }));
@@ -70,44 +65,39 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     const val = e.target.value;
     setForm((p) => ({ ...p, cedula: val }));
     clearTimeout(timerBusqueda.current);
-    if (val.trim().length >= 3) {
-      setIsBuscando(true);
-      timerBusqueda.current = setTimeout(() => {
-        const match = clientes.find((c) => normCed(c.cedula) === normCed(val));
-        if (match) {
-          setClienteEncontrado(match);
-          setForm((p) => ({ ...p, cliente: match.nombres, telefono: match.telefono || '' }));
-        } else {
-          setClienteEncontrado(null);
-          setForm((p) => ({ ...p, cliente: '', telefono: '' }));
-        }
-        setIsBuscando(false);
-      }, 300);
-    } else {
+    if (val.trim().length < 3) return (setIsBuscando(false), setClienteEncontrado(null));
+    setIsBuscando(true);
+    timerBusqueda.current = setTimeout(() => {
+      const match = clientes.find((c) => normCed(c.cedula) === normCed(val));
+      setClienteEncontrado(match || null);
+      setForm((p) => ({ ...p, cliente: match?.nombres || '', telefono: match?.telefono || '' }));
       setIsBuscando(false);
-      setClienteEncontrado(null);
-    }
+    }, 300);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.cliente.trim()) return;
-    const formulaUsada = formulas.find((f) => f.id === form.formulaId) || FORMULA_INICIAL;
-    const montoOrig = parseFloat(form.monto) || 15.0;
-    await syncClienteDesdeVenta(form.cliente, form.cedula, form.telefono, form.servicio);
-    onSave({
-      id: `#V-${Math.floor(100 + Math.random() * 900)}`, fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      fechaISO: getLocalDateISO(), vendedor: esAdmin ? form.vendedor : usuario.nombre, cliente: form.cliente.trim(),
-      cedulaCliente: form.cedula.trim(), servicio: form.servicio, moneda: form.moneda || 'Dólares',
-      formulaAplicada: formulaUsada.nombre, monto: montoOrig, montoFinal: calcularMontoFinal(montoOrig, formulaUsada),
-      pago: form.metodoPago, referenciaPago: form.referenciaPago.trim()
-    });
-    setForm(initForm); setClienteEncontrado(null); onHide();
+    if (!form.cliente.trim() || isSaving) return;
+    setIsSaving(true);
+    try {
+      const fUsada = formulas.find((f) => f.id === form.formulaId) || FORMULA_INICIAL, orig = parseFloat(form.monto) || 15.0;
+      await syncClienteDesdeVenta(form.cliente, form.cedula, form.telefono, form.servicio);
+      await onSave({
+        id: `#V-${Math.floor(100 + Math.random() * 900)}`, fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        fechaISO: getLocalDateISO(), vendedor: esAdmin ? form.vendedor : usuario.nombre, cliente: form.cliente.trim(),
+        cedulaCliente: form.cedula.trim(), servicio: form.servicio, moneda: form.moneda || 'Dólares',
+        formulaAplicada: fUsada.nombre, monto: orig, montoFinal: calcularMontoFinal(orig, fUsada),
+        pago: form.metodoPago, referenciaPago: form.referenciaPago.trim()
+      });
+      await new Promise((r) => setTimeout(r, 600));
+      setForm(initForm); setClienteEncontrado(null); onHide();
+    } finally { setIsSaving(false); }
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" dialogClassName="modal-lg modal-venta-amplio" centered enforceFocus={false} contentClassName="dark-card">
-      <Modal.Header closeButton closeVariant="white" className="border-gold">
+    <Modal show={show} onHide={isSaving ? undefined : onHide} size="lg" dialogClassName="modal-lg modal-venta-amplio" centered enforceFocus={false} contentClassName="dark-card position-relative overflow-hidden">
+      {isSaving && <GoldLoader overlay text="Registrando Venta..." subtext="Sincronizando cliente y liquidando corte..." />}
+      <Modal.Header closeButton={!isSaving} closeVariant="white" className="border-gold">
         <Modal.Title className="text-white fw-bold fs-5"><i className="bi bi-cash-coin text-gold-accent me-2"></i>Registrar Venta de Corte</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
@@ -123,7 +113,7 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
             {clienteEncontrado && (
               <Col xs={12}>
                 <div className="alert alert-success py-2 px-3 m-0 small border-gold d-flex align-items-center justify-content-between rounded" style={{ background: '#0f2415', color: '#75e69e', borderColor: '#2b8a3e' }}>
-                  <span><i className="bi bi-check-circle-fill me-2"></i>Cliente encontrado: <strong>{clienteEncontrado.nombres}</strong> ({clienteEncontrado.visitas || 1} visitas registradas)</span>
+                  <span><i className="bi bi-check-circle-fill me-2"></i>Cliente encontrado: <strong>{clienteEncontrado.nombres}</strong> ({clienteEncontrado.visitas || 1} visitas)</span>
                   <span className="badge-pill-custom">Datos cargados</span>
                 </div>
               </Col>
@@ -137,8 +127,10 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
           </Row>
         </Modal.Body>
         <Modal.Footer className="border-gold">
-          <Button variant="secondary" onClick={onHide}>Cancelar</Button>
-          <Button type="submit" className="btn-primary-gradient px-4">Guardar Venta</Button>
+          <Button variant="secondary" onClick={onHide} disabled={isSaving}>Cancelar</Button>
+          <Button type="submit" className="btn-primary-gradient px-4" disabled={isSaving}>
+            {isSaving ? <span><i className="bi bi-arrow-repeat spin-animation me-2"></i>Guardando...</span> : 'Guardar Venta'}
+          </Button>
         </Modal.Footer>
       </Form>
     </Modal>

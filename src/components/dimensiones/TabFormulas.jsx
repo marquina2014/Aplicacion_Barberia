@@ -14,7 +14,8 @@ const TabFormulas = () => {
   const [formulas, setFormulas] = useState([FORMULA_INICIAL]);
   const [showModal, setShowModal] = useState(false);
   const [editingFormula, setEditingFormula] = useState(null);
-  const [filtroId, setFiltroId] = useState('');
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroPasos, setFiltroPasos] = useState('');
 
   const cargarFormulas = async () => {
     const data = await getFormulas();
@@ -28,24 +29,34 @@ const TabFormulas = () => {
     setFormulas(actualizadas);
   };
 
-  const filtradas = formulas.filter((f) => !filtroId || f.id === filtroId);
+  const filtradas = formulas.filter((f) => {
+    if (filtroNombre && f.nombre !== filtroNombre) return false;
+    if (filtroPasos !== '' && String(f.pasos || 2) !== String(filtroPasos)) return false;
+    return true;
+  });
+
+  const pasosUnicos = [...new Set(formulas.map((f) => f.pasos || 2))].sort((a, b) => a - b);
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <div style={{ maxWidth: '380px', width: '100%' }}>
-          <Form.Select
-            className="dark-input"
-            value={filtroId}
-            onChange={(e) => setFiltroId(e.target.value)}
-          >
-            <option value="">Todas las fórmulas ({formulas.length})</option>
-            {formulas.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.nombre} — Regla: {f.descripcion || `${f.pasos || 2} pasos`}
-              </option>
-            ))}
-          </Form.Select>
+        <div className="d-flex flex-wrap align-items-center gap-2" style={{ flex: '1 1 auto', maxWidth: '620px' }}>
+          <div style={{ minWidth: '220px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroNombre} onChange={(e) => setFiltroNombre(e.target.value)}>
+              <option value="">Todas las fórmulas ({formulas.length})</option>
+              {formulas.map((f) => (
+                <option key={f.id} value={f.nombre}>{f.nombre}</option>
+              ))}
+            </Form.Select>
+          </div>
+          <div style={{ minWidth: '180px', flex: '1' }}>
+            <Form.Select className="dark-input" value={filtroPasos} onChange={(e) => setFiltroPasos(e.target.value)}>
+              <option value="">Todos los pasos</option>
+              {pasosUnicos.map((p) => (
+                <option key={p} value={p}>{p} Pasos</option>
+              ))}
+            </Form.Select>
+          </div>
         </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={() => { setEditingFormula(null); setShowModal(true); }}>
           <i className="bi bi-plus-circle-fill"></i><span>Nueva Fórmula</span>
@@ -61,7 +72,7 @@ const TabFormulas = () => {
           </thead>
           <tbody>
             {filtradas.length === 0 ? (
-              <tr><td colSpan="8" className="text-center py-4 text-muted-custom">No hay fórmulas registradas.</td></tr>
+              <tr><td colSpan="8" className="text-center py-4 text-muted-custom">No hay fórmulas que coincidan.</td></tr>
             ) : filtradas.map((f) => (
               <tr key={f.id}>
                 <td className="fw-bold text-gold-accent">{f.id}</td>

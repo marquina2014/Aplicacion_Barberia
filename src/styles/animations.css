@@ -1,0 +1,114 @@
+/**
+ * ANIMACIONES GLOBALES: TRANSICIONES DE PANTALLA Y LOADER DORADO / NEGRO
+ */
+
+/* 1. Efecto cinematográfico de movimiento al cambiar de pantalla */
+.page-transition-wrapper {
+  animation: pageFadeSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes pageFadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.994);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. Loader Overlay Dorado y Negro */
+.gold-loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1060;
+  border-radius: 12px;
+  animation: fadeInLoader 0.2s ease-out forwards;
+}
+
+.gold-loader-card {
+  background: #08090a;
+  border: 1px solid var(--border-gold, #d4af37);
+  box-shadow: 0 0 35px rgba(212, 175, 55, 0.28), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  border-radius: 16px;
+  padding: 1.75rem 2.25rem;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Anillo de giro dorado */
+.gold-spinner-container {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gold-spinner-outer {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(212, 175, 55, 0.15);
+  border-top-color: #d4af37;
+  border-right-color: #f3e5ab;
+  animation: goldRotate 0.85s linear infinite;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+.gold-spinner-inner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 55, 0.1);
+  border-bottom-color: #d4af37;
+  border-left-color: #aa820a;
+  animation: goldRotateReverse 1.1s linear infinite;
+}
+
+.gold-spinner-icon {
+  position: absolute;
+  color: #d4af37;
+  font-size: 1.25rem;
+  animation: goldPulse 1.4s ease-in-out infinite alternate;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+@keyframes goldRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes goldRotateReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes goldPulse {
+  0% { transform: scale(0.92); opacity: 0.75; }
+  100% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes fadeInLoader {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -66,7 +66,7 @@ const GestionDimensiones = () => {
         </Nav>
       </div>
 
-      <div className="mt-2">
+      <div key={tabActiva} className="mt-2 page-transition-wrapper">
         {tabActiva === 'servicios' && <TabServicios />}
         {tabActiva === 'metodos' && <TabMetodosPago />}
         {tabActiva === 'formulas' && <TabFormulas />}

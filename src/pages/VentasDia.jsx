@@ -22,6 +22,7 @@ const VentasDia = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const initFilters = {
     vendedor: vendedorInicial,
     cliente: '',
@@ -40,6 +41,7 @@ const VentasDia = () => {
     setVentas(listaVentas);
     setVendedores(listaVendedores.map((v) => v.nombres));
     setFormulaActiva(obtenerFormulaActiva(listaFormulas));
+    setIsLoading(false);
   };
 
   useEffect(() => { cargarDatos(); }, []);
@@ -133,7 +135,7 @@ const VentasDia = () => {
         </div>
       </div>
 
-      <ListaVentas ventas={visibles} formula={formulaActiva} />
+      <ListaVentas ventas={visibles} formula={formulaActiva} loading={isLoading || isRefreshing} />
 
       <ModalNuevaVenta show={showModal} onHide={() => setShowModal(false)} onSave={handleSaveVenta} />
     </MainLayout>

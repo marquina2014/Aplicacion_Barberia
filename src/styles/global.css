@@ -16,6 +16,7 @@
 @import './select.css';
 @import './calendar.css';
 @import './header.css';
+@import './animations.css';
 
 * {
   box-sizing: border-box;
