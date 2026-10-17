@@ -40,6 +40,12 @@ const BarraFiltrosClientes = ({
 
   return (
     <div className="mb-4">
+      <div className="d-flex justify-content-end align-items-center mb-3" style={{ minHeight: '42px' }}>
+        <span className="badge-pill-custom py-2 px-3" style={{ fontSize: '0.82rem' }}>
+          <i className="bi bi-info-circle text-gold-accent me-1"></i>Registro automático desde ventas
+        </span>
+      </div>
+
       <div className="dark-card p-3 mb-3">
         <div className="filters-grid-row">
           <Form.Group controlId="fc-nombre">

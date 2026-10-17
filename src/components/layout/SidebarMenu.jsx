@@ -23,11 +23,11 @@ const SidebarMenu = ({ onNavigate, isMobile = false }) => {
 
   const allItems = [
     { to: '/dashboard', label: 'Inicio', icon: 'bi-grid-fill', adminOnly: false },
-    { to: '/vendedores', label: 'Gestión Barberos', icon: 'bi-scissors', adminOnly: true },
-    { to: '/clientes', label: 'Gestión Clientes', icon: 'bi-people-fill', adminOnly: true },
-    { to: '/dimensiones', label: 'Dimensiones', icon: 'bi-diagram-3-fill', adminOnly: true },
     { to: '/ventas-dia', label: 'Ventas del Día', icon: 'bi-calendar2-day-fill', adminOnly: false },
-    { to: '/historico', label: 'Histórico', icon: 'bi-clock-history', adminOnly: false }
+    { to: '/historico', label: 'Histórico', icon: 'bi-clock-history', adminOnly: false },
+    { to: '/vendedores', label: 'Gestión Barberos', icon: 'bi-scissors', adminOnly: true },
+    { to: '/clientes', label: 'Pantalla de Clientes', icon: 'bi-people-fill', adminOnly: true },
+    { to: '/dimensiones', label: 'Dimensiones', icon: 'bi-diagram-3-fill', adminOnly: true }
   ];
 
   const menuItems = allItems.filter((item) => !item.adminOnly || esAdmin);

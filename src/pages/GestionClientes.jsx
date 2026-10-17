@@ -50,7 +50,7 @@ const GestionClientes = () => {
   });
 
   return (
-    <MainLayout title="Gestión de Clientes" subtitle="Directorio de clientes registrados automáticamente desde los cortes">
+    <MainLayout title="Pantalla de Clientes" subtitle="Directorio de clientes registrados automáticamente desde los cortes">
       <BarraFiltrosClientes
         filters={filters} onFilterChange={(field, val) => setFilters((prev) => ({ ...prev, [field]: val }))}
         onReset={() => setFilters(initFilters)} onRefresh={handleRefresh}
