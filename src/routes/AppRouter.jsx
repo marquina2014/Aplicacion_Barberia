@@ -52,4 +52,4 @@ const AppRouter = () => {
   );
 };
 
-gexport default AppRouter;
+export default AppRouter;
