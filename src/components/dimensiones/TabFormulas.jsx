@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge } from 'react-bootstrap';
+import { Table, Button, Badge, Form } from 'react-bootstrap';
 import ModalFormula from '../formulas/ModalFormula';
 import { getFormulas, saveFormula } from '../../services/dimensionesApi';
 import { FORMULA_INICIAL } from '../../utils/formulasUtils';
@@ -14,6 +14,7 @@ const TabFormulas = () => {
   const [formulas, setFormulas] = useState([FORMULA_INICIAL]);
   const [showModal, setShowModal] = useState(false);
   const [editingFormula, setEditingFormula] = useState(null);
+  const [filtroId, setFiltroId] = useState('');
 
   const cargarFormulas = async () => {
     const data = await getFormulas();
@@ -27,12 +28,25 @@ const TabFormulas = () => {
     setFormulas(actualizadas);
   };
 
+  const filtradas = formulas.filter((f) => !filtroId || f.id === filtroId);
+
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <span className="small text-secondary-custom">
-          Fórmulas registradas: <strong className="text-white">{formulas.length}</strong> | Activas: <strong className="text-gold-accent">{formulas.filter((f) => Boolean(f.estado)).length}</strong>
-        </span>
+        <div style={{ maxWidth: '380px', width: '100%' }}>
+          <Form.Select
+            className="dark-input"
+            value={filtroId}
+            onChange={(e) => setFiltroId(e.target.value)}
+          >
+            <option value="">Todas las fórmulas ({formulas.length})</option>
+            {formulas.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.nombre} — Regla: {f.descripcion || `${f.pasos || 2} pasos`}
+              </option>
+            ))}
+          </Form.Select>
+        </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={() => { setEditingFormula(null); setShowModal(true); }}>
           <i className="bi bi-plus-circle-fill"></i><span>Nueva Fórmula</span>
         </Button>
@@ -46,7 +60,9 @@ const TabFormulas = () => {
             </tr>
           </thead>
           <tbody>
-            {formulas.map((f) => (
+            {filtradas.length === 0 ? (
+              <tr><td colSpan="8" className="text-center py-4 text-muted-custom">No hay fórmulas registradas.</td></tr>
+            ) : filtradas.map((f) => (
               <tr key={f.id}>
                 <td className="fw-bold text-gold-accent">{f.id}</td>
                 <td className="fw-semibold text-white"><i className="bi bi-calculator text-gold-accent me-2"></i>{f.nombre}</td>

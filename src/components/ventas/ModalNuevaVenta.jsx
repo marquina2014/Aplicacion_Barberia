@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
@@ -20,12 +20,10 @@ const METODOS_BASE = [
 const normCed = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
 const ModalNuevaVenta = ({ show, onHide, onSave }) => {
-  const usuario = obtenerUsuarioActual();
-  const esAdmin = esAdministrador(usuario);
+  const usuario = obtenerUsuarioActual(), esAdmin = esAdministrador(usuario);
   const initForm = {
-    vendedor: usuario?.nombre || '',
-    cedula: '', cliente: '', telefono: '', servicio: 'Corte Clásico', moneda: 'Dólares',
-    monto: '15.00', metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
+    vendedor: usuario?.nombre || '', cedula: '', cliente: '', telefono: '', servicio: 'Corte Clásico',
+    moneda: 'Dólares', monto: '15.00', metodoPago: 'Efectivo', referenciaPago: '', formulaId: FORMULA_INICIAL.id
   };
   const [form, setForm] = useState(initForm);
   const [vendedores, setVendedores] = useState([]);
@@ -33,7 +31,8 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
   const [clientes, setClientes] = useState([]);
   const [servicios, setServicios] = useState(SERVICIOS_BASE);
   const [todosMetodos, setTodosMetodos] = useState(METODOS_BASE);
-  const [clienteEncontrado, setClienteEncontrado] = useState(null);
+  const [clienteEncontrado, setClienteEncontrado] = useState(null), [isBuscando, setIsBuscando] = useState(false);
+  const timerBusqueda = useRef(null);
 
   useEffect(() => {
     if (!show) return;
@@ -52,14 +51,14 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       setForm((p) => ({ ...p, vendedor: esAdmin ? (p.vendedor || activosV?.[0]?.nombres || actual.nombre) : actual.nombre, formulaId: fActiva.id }));
     });
     setClienteEncontrado(null);
+    setIsBuscando(false);
   }, [show]);
 
   const metodosFiltrados = todosMetodos.filter((m) => !m.moneda || m.moneda === form.moneda);
 
   const handleMonedaChange = (nuevaMoneda) => {
     const validos = todosMetodos.filter((m) => !m.moneda || m.moneda === nuevaMoneda);
-    const primerMetodo = validos.length ? validos[0].value : 'Efectivo';
-    setForm((p) => ({ ...p, moneda: nuevaMoneda, metodoPago: primerMetodo }));
+    setForm((p) => ({ ...p, moneda: nuevaMoneda, metodoPago: validos[0]?.value || 'Efectivo' }));
   };
 
   const handleServicioChange = (nuevoServ) => {
@@ -69,9 +68,25 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
 
   const handleCedulaChange = (e) => {
     const val = e.target.value;
-    const match = val.trim().length >= 4 && clientes.find((c) => normCed(c.cedula) === normCed(val));
-    setClienteEncontrado(match || null);
-    setForm((p) => ({ ...p, cedula: val, cliente: match ? match.nombres : p.cliente, telefono: match ? (match.telefono || '') : p.telefono }));
+    setForm((p) => ({ ...p, cedula: val }));
+    clearTimeout(timerBusqueda.current);
+    if (val.trim().length >= 3) {
+      setIsBuscando(true);
+      timerBusqueda.current = setTimeout(() => {
+        const match = clientes.find((c) => normCed(c.cedula) === normCed(val));
+        if (match) {
+          setClienteEncontrado(match);
+          setForm((p) => ({ ...p, cliente: match.nombres, telefono: match.telefono || '' }));
+        } else {
+          setClienteEncontrado(null);
+          setForm((p) => ({ ...p, cliente: '', telefono: '' }));
+        }
+        setIsBuscando(false);
+      }, 300);
+    } else {
+      setIsBuscando(false);
+      setClienteEncontrado(null);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -81,23 +96,13 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
     const montoOrig = parseFloat(form.monto) || 15.0;
     await syncClienteDesdeVenta(form.cliente, form.cedula, form.telefono, form.servicio);
     onSave({
-      id: `#V-${Math.floor(100 + Math.random() * 900)}`,
-      fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      fechaISO: getLocalDateISO(),
-      vendedor: esAdmin ? form.vendedor : usuario.nombre,
-      cliente: form.cliente.trim(),
-      cedulaCliente: form.cedula.trim(),
-      servicio: form.servicio,
-      moneda: form.moneda || 'Dólares',
-      formulaAplicada: formulaUsada.nombre,
-      monto: montoOrig,
-      montoFinal: calcularMontoFinal(montoOrig, formulaUsada),
-      pago: form.metodoPago,
-      referenciaPago: form.referenciaPago.trim()
+      id: `#V-${Math.floor(100 + Math.random() * 900)}`, fechaHora: 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      fechaISO: getLocalDateISO(), vendedor: esAdmin ? form.vendedor : usuario.nombre, cliente: form.cliente.trim(),
+      cedulaCliente: form.cedula.trim(), servicio: form.servicio, moneda: form.moneda || 'Dólares',
+      formulaAplicada: formulaUsada.nombre, monto: montoOrig, montoFinal: calcularMontoFinal(montoOrig, formulaUsada),
+      pago: form.metodoPago, referenciaPago: form.referenciaPago.trim()
     });
-    setForm(initForm);
-    setClienteEncontrado(null);
-    onHide();
+    setForm(initForm); setClienteEncontrado(null); onHide();
   };
 
   return (
@@ -108,13 +113,13 @@ const ModalNuevaVenta = ({ show, onHide, onSave }) => {
       <Form onSubmit={handleSubmit}>
         <Modal.Body className="p-3 p-md-4">
           <Row className="g-3">
-            <Col xs={12} md={6}><FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required /></Col>
             <Col xs={12} md={6}>
-              <FormInputField id="mv-cedula" label="Cédula del Cliente (Buscar / Registrar)" value={form.cedula} list="lista-cedulas-registradas" onChange={handleCedulaChange} placeholder="Ej: V-28123456" icon="bi-card-text" />
+              <FormInputField id="mv-cedula" label={isBuscando ? 'Cédula (Buscando...)' : 'Cédula del Cliente (Buscar / Registrar)'} value={form.cedula} list="lista-cedulas-registradas" onChange={handleCedulaChange} placeholder="Ej: V-28123456" icon={isBuscando ? 'bi-arrow-repeat spin-animation text-gold-accent' : 'bi-card-text'} />
               <datalist id="lista-cedulas-registradas">{clientes.filter((c) => c.cedula).map((c) => <option key={c.id} value={c.cedula}>{c.nombres}</option>)}</datalist>
             </Col>
             <Col xs={12} md={6}><FormInputField id="mv-cliente" label="Nombre y Apellido del Cliente" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Ej: Carlos Mendoza" icon="bi-person" required /></Col>
             <Col xs={12} md={6}><FormInputField id="mv-tel-cliente" label="Teléfono de Contacto" type="tel" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} placeholder="+58 412 0000000" icon="bi-telephone" /></Col>
+            <Col xs={12} md={6}><FormSelectField id="mv-vendedor" label="Barbero" value={esAdmin ? form.vendedor : usuario.nombre} onChange={(e) => setForm({ ...form, vendedor: e.target.value })} options={vendedores} icon="bi-scissors" disabled={!esAdmin} required /></Col>
             {clienteEncontrado && (
               <Col xs={12}>
                 <div className="alert alert-success py-2 px-3 m-0 small border-gold d-flex align-items-center justify-content-between rounded" style={{ background: '#0f2415', color: '#75e69e', borderColor: '#2b8a3e' }}>

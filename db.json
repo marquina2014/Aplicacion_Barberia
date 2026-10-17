@@ -3,13 +3,13 @@
     {
       "id": "1",
       "usuario": "Marquina2014",
-      "password": "123456",
+      "password": "",
       "email": "Luiseduardo15097@gmail.com",
       "nombres": "luis marquina",
       "rol": "administrador",
       "sexo": "masculino",
       "edad": 30,
-      "telefono": "04127153847",
+      "telefono": "",
       "estado": true,
       "fotografia": ""
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Table, Button, Badge, Modal, Form } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import { getServicios, saveServicio } from '../../services/dimensionesApi';
 
@@ -7,7 +7,7 @@ const TabServicios = () => {
   const [servicios, setServicios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [busqueda, setBusqueda] = useState('');
+  const [filtroId, setFiltroId] = useState('');
   const initForm = { nombre: '', precio: 15, estado: true };
   const [form, setForm] = useState(initForm);
 
@@ -29,16 +29,24 @@ const TabServicios = () => {
     setShowModal(false);
   };
 
-  const filtrados = servicios.filter((s) => (s.nombre || '').toLowerCase().includes(busqueda.toLowerCase()));
+  const filtrados = servicios.filter((s) => !filtroId || s.id === filtroId);
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <div style={{ maxWidth: '320px', width: '100%' }}>
-          <Form.Control
-            type="text" className="dark-input" placeholder="Buscar servicio..."
-            value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-          />
+        <div style={{ maxWidth: '380px', width: '100%' }}>
+          <Form.Select
+            className="dark-input"
+            value={filtroId}
+            onChange={(e) => setFiltroId(e.target.value)}
+          >
+            <option value="">Todos los servicios ({servicios.length})</option>
+            {servicios.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nombre} — Precio: ${Number(s.precio || 0).toFixed(2)}
+              </option>
+            ))}
+          </Form.Select>
         </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={handleOpenNew}>
           <i className="bi bi-plus-circle-fill"></i><span>Nuevo Servicio</span>

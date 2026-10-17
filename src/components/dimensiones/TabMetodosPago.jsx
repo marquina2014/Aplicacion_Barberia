@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge, Modal, Form, ButtonGroup } from 'react-bootstrap';
+import { Table, Button, Badge, Modal, Form } from 'react-bootstrap';
 import FormInputField from '../common/FormInputField';
 import FormSelectField from '../common/FormSelectField';
 import { getMetodosPago, saveMetodoPago } from '../../services/dimensionesApi';
@@ -10,7 +10,7 @@ const TabMetodosPago = () => {
   const [metodos, setMetodos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [filtroMoneda, setFiltroMoneda] = useState('Todas');
+  const [filtroId, setFiltroId] = useState('');
   const initForm = { nombre: '', moneda: 'Dólares', estado: true };
   const [form, setForm] = useState(initForm);
 
@@ -32,27 +32,25 @@ const TabMetodosPago = () => {
     setShowModal(false);
   };
 
-  const filtrados = metodos.filter((m) => {
-    if (filtroMoneda === 'Todas') return true;
-    return m.moneda === filtroMoneda;
-  });
+  const filtrados = metodos.filter((m) => !filtroId || m.id === filtroId);
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <ButtonGroup className="border border-gold rounded overflow-hidden">
-          {['Todas', 'Dólares', 'Bolívares'].map((opt) => (
-            <Button
-              key={opt}
-              variant={filtroMoneda === opt ? 'warning' : 'dark'}
-              size="sm"
-              className={filtroMoneda === opt ? 'text-black fw-bold px-3' : 'text-white px-3'}
-              onClick={() => setFiltroMoneda(opt)}
-            >
-              {opt === 'Todas' ? 'Todas las Monedas' : opt === 'Dólares' ? 'Dólares ($)' : 'Bolívares (Bs)'}
-            </Button>
-          ))}
-        </ButtonGroup>
+        <div style={{ maxWidth: '380px', width: '100%' }}>
+          <Form.Select
+            className="dark-input"
+            value={filtroId}
+            onChange={(e) => setFiltroId(e.target.value)}
+          >
+            <option value="">Todos los métodos de pago ({metodos.length})</option>
+            {metodos.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.nombre} — Moneda: {m.moneda || 'Dólares'}
+              </option>
+            ))}
+          </Form.Select>
+        </div>
         <Button className="btn-primary-gradient d-flex align-items-center gap-2" onClick={handleOpenNew}>
           <i className="bi bi-plus-circle-fill"></i><span>Nuevo Método de Pago</span>
         </Button>
@@ -67,7 +65,7 @@ const TabMetodosPago = () => {
           </thead>
           <tbody>
             {filtrados.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay métodos de pago registrados en esta moneda.</td></tr>
+              <tr><td colSpan="5" className="text-center py-4 text-muted-custom">No hay métodos de pago registrados.</td></tr>
             ) : filtrados.map((m) => (
               <tr key={m.id}>
                 <td className="fw-bold text-gold-accent">{m.id}</td>
